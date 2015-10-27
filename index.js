@@ -1,0 +1,1 @@
+import StartApp from 'simple';
