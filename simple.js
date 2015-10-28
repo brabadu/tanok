@@ -21,10 +21,9 @@ export default function(model, update, View, container) {
     .merge(...dispatcherArray)
     .scan((state, action) => action(state), model)
     .startWith(model)
+    .do((state) => render(<View {...state} eventStream={eventStream}/>, container))
     .subscribe(
-       function(state) {
-           render(<View {...state} eventStream={eventStream}/>, container)
-       },
-       console.error.bind(console)
+      function(){},
+      console.error.bind(console)
     );
 }
