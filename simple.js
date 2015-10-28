@@ -1,15 +1,12 @@
 import React from 'react';
 import {render} from 'react-dom';
 import Rx from 'rx';
+import {actionIs} from './utils.js';
 
 
 /*
 update is an Array of pairs: [actionName, actionHandler]
 */
-
-function actionIs(actionName) {
-  return ({action}) => action === actionName;
-}
 
 export default function(model, update, View, container) {
   let eventStream = new Rx.Subject();
