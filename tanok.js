@@ -16,7 +16,7 @@ export default function(model, update, View, container) {
 
   return Rx.Observable
     .merge(...dispatcherArray)
-    .scan(((state, action) => action(state)), model)
+    .scan((([state, _], action) => action(state)), [model])
     .startWith([model])
     .do(([state, _]) => render(<View {...state} eventStream={eventStream} />, container))
     .flatMap(([state, effect]) => effect ? effect(state, eventStream) : Rx.Observable.empty() )
