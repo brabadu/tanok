@@ -1,28 +1,34 @@
 import StartApp from './tanok.js';
 import React from 'react'
+import {actionIs, filter, debounce} from './utils.js';
 
-let model = {count: 0};
+
+let model = {
+  count: 0,
+  history: []
+};
+
 let update = [
-  ['inc', (params) => (state) => {
+  [[filter(actionIs('inc'))], (params) => (state) => {
     state.count += 1
     return [state, wowEffect]
   }],
-  ['dec', (params) => (state) => {
+  [[filter(actionIs('dec'))], (params) => (state) => {
     state.count -= 1
     return [state]
   }],
-  ['wow', (params) => (state) => {
-    state.count = 1000000
+  [[filter(actionIs('wow')), debounce(1000)], (params) => (state) => {
+    state.history.push(state.count)
     return [state]
   }]
 ]
 
 function wowEffect (state, eventStream) {
-  return Rx.Observable.fromCallback(setTimeout)(function(){
+  return Rx.Observable.just(1).do(function(){
     eventStream.onNext({
       action: 'wow'
     })
-  }, 3000)
+  })
 }
 
 const Counter = React.createClass({
@@ -41,6 +47,7 @@ const Counter = React.createClass({
         <button onClick={this.onPlusClick}>+</button>
         <span>{this.props.count}</span>
         <button onClick={this.onMinusClick}>-</button>
+        History: [{this.props.history.join(', ')}]
         </div>
     }
 });

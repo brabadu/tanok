@@ -3,16 +3,13 @@ import {render} from 'react-dom';
 import Rx from 'rx';
 import {actionIs} from './utils.js';
 
-
-/*
-update is an Array of trios: [actionName, actionHandler, effect]
-*/
-
 export default function(model, update, View, container) {
   let eventStream = new Rx.Subject();
 
-  let dispatcherArray = update.map(([actionName, actionHandler]) =>
-    eventStream.filter(actionIs(actionName)).map(actionHandler))
+  let dispatcherArray = update.map(([actionCondition, actionHandler]) =>
+    actionCondition
+      .reduce((accStream, cond) => cond.call(accStream), eventStream)
+      .map(actionHandler))
 
   return Rx.Observable
     .merge(...dispatcherArray)
