@@ -1,13 +1,18 @@
-import StartApp from './tanok.js';
 import React from 'react'
-import {actionIs, filter, debounce} from './utils.js';
+import tanok from '../../tanok.js';
+import {actionIs, filter, debounce} from '../../utils.js';
 
-
+/*
+  MODEL
+*/
 let model = {
   count: 0,
   history: []
 };
 
+/*
+  UPDATE
+*/
 let update = [
   [[filter(actionIs('inc'))], (params) => (state) => {
     state.count += 1
@@ -31,6 +36,9 @@ function wowEffect (state, eventStream) {
   })
 }
 
+/*
+  VIEW
+*/
 const Counter = React.createClass({
   onPlusClick: function() {
     this.props.eventStream.onNext({
@@ -52,6 +60,10 @@ const Counter = React.createClass({
     }
 });
 
+
+/*
+  Starting the app
+*/
 let div = document.createElement('div');
 document.body.appendChild(div)
-StartApp(model, update, Counter, div);
+tanok(model, update, Counter, div);
