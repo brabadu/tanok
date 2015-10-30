@@ -1,10 +1,11 @@
 module.exports = {
     entry: {
-      main: "./main/main.js"
+      main: "./main/main.js",
+      simple: "./simple/simple.js"
     },
     output: {
         path: __dirname,
-        filename: "[name].bundle.js"
+        filename: "./[name]/[name].bundle.js"
     },
     module: {
         loaders: [

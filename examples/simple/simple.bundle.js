@@ -52,9 +52,9 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _tanokJs = __webpack_require__(157);
+	var _simpleJs = __webpack_require__(162);
 
-	var _tanokJs2 = _interopRequireDefault(_tanokJs);
+	var _simpleJs2 = _interopRequireDefault(_simpleJs);
 
 	var _utilsJs = __webpack_require__(161);
 
@@ -62,37 +62,23 @@
 	  MODEL
 	*/
 	var model = {
-	  count: 0,
-	  history: []
+	  count: 0
 	};
 
 	/*
 	  UPDATE
 	*/
-	var update = [[[(0, _utilsJs.filter)((0, _utilsJs.actionIs)('inc'))], function (params) {
+	var update = [['inc', function (params) {
 	  return function (state) {
 	    state.count += 1;
-	    return [state, wowEffect];
+	    return state;
 	  };
-	}], [[(0, _utilsJs.filter)((0, _utilsJs.actionIs)('dec'))], function (params) {
+	}], ['dec', function (params) {
 	  return function (state) {
 	    state.count -= 1;
-	    return [state];
-	  };
-	}], [[(0, _utilsJs.filter)((0, _utilsJs.actionIs)('wow')), (0, _utilsJs.debounce)(1000)], function (params) {
-	  return function (state) {
-	    state.history.push(state.count);
-	    return [state];
+	    return state;
 	  };
 	}]];
-
-	function wowEffect(state, eventStream) {
-	  return Rx.Observable.just(1)['do'](function () {
-	    eventStream.onNext({
-	      action: 'wow'
-	    });
-	  });
-	}
 
 	/*
 	  VIEW
@@ -128,10 +114,7 @@
 	        'button',
 	        { onClick: this.onMinusClick },
 	        '-'
-	      ),
-	      'History: [',
-	      this.props.history.join(', '),
-	      ']'
+	      )
 	    );
 	  }
 	});
@@ -141,7 +124,7 @@
 	*/
 	var div = document.createElement('div');
 	document.body.appendChild(div);
-	(0, _tanokJs2['default'])(model, update, Counter, div);
+	(0, _simpleJs2['default'])(model, update, Counter, div);
 
 /***/ },
 /* 1 */
@@ -19682,74 +19665,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 157 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactDom = __webpack_require__(158);
-
-	var _rx = __webpack_require__(159);
-
-	var _rx2 = _interopRequireDefault(_rx);
-
-	var _utilsJs = __webpack_require__(161);
-
-	exports['default'] = function (model, update, View, container) {
-	  var _Rx$Observable;
-
-	  var eventStream = new _rx2['default'].Subject();
-
-	  var dispatcherArray = update.map(function (_ref) {
-	    var _ref2 = _slicedToArray(_ref, 2);
-
-	    var actionCondition = _ref2[0];
-	    var actionHandler = _ref2[1];
-	    return actionCondition.reduce(function (accStream, cond) {
-	      return cond.call(accStream);
-	    }, eventStream).map(actionHandler);
-	  });
-
-	  return (_Rx$Observable = _rx2['default'].Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray)).scan(function (_ref3, action) {
-	    var _ref32 = _slicedToArray(_ref3, 2);
-
-	    var state = _ref32[0];
-	    var _ = _ref32[1];
-	    return action(state);
-	  }, [model]).startWith([model])['do'](function (_ref4) {
-	    var _ref42 = _slicedToArray(_ref4, 2);
-
-	    var state = _ref42[0];
-	    var _ = _ref42[1];
-	    return (0, _reactDom.render)(_react2['default'].createElement(View, _extends({}, state, { eventStream: eventStream })), container);
-	  }).flatMap(function (_ref5) {
-	    var _ref52 = _slicedToArray(_ref5, 2);
-
-	    var state = _ref52[0];
-	    var effect = _ref52[1];
-	    return effect ? effect(state, eventStream) : _rx2['default'].Observable.empty();
-	  }).subscribe(function () {}, console.error.bind(console));
-	};
-
-	module.exports = exports['default'];
-
-/***/ },
+/* 157 */,
 /* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -32057,6 +31973,62 @@
 	    return this.debounce(time);
 	  };
 	}
+
+/***/ },
+/* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(158);
+
+	var _rx = __webpack_require__(159);
+
+	var _rx2 = _interopRequireDefault(_rx);
+
+	var _utilsJs = __webpack_require__(161);
+
+	/*
+	update is an Array of pairs: [actionName, actionHandler]
+	*/
+
+	exports['default'] = function (model, update, View, container) {
+	  var _Rx$Observable;
+
+	  var eventStream = new _rx2['default'].Subject();
+
+	  var dispatcherArray = update.map(function (_ref) {
+	    var _ref2 = _slicedToArray(_ref, 2);
+
+	    var actionName = _ref2[0];
+	    var actionHandler = _ref2[1];
+	    return eventStream.filter((0, _utilsJs.actionIs)(actionName)).map(actionHandler);
+	  });
+
+	  return (_Rx$Observable = _rx2['default'].Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray)).scan(function (state, action) {
+	    return action(state);
+	  }, model).startWith(model)['do'](function (state) {
+	    return (0, _reactDom.render)(_react2['default'].createElement(View, _extends({}, state, { eventStream: eventStream })), container);
+	  }).subscribe(function () {}, console.error.bind(console));
+	};
+
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ]);
