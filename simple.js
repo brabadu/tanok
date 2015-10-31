@@ -1,7 +1,7 @@
 import React from 'react';
 import {render} from 'react-dom';
 import Rx from 'rx';
-import {actionIs} from './utils.js';
+import {actionIs} from './helpers.js';
 
 
 /*
@@ -20,7 +20,7 @@ export default function(model, update, View, container) {
     .startWith(model)
     .do((state) => render(<View {...state} eventStream={eventStream}/>, container))
     .subscribe(
-      function(){},
+      Rx.helpers.noop,
       console.error.bind(console)
     );
 }
