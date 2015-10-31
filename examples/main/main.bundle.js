@@ -56,7 +56,7 @@
 
 	var _tanokJs2 = _interopRequireDefault(_tanokJs);
 
-	var _utilsJs = __webpack_require__(161);
+	var _helpersJs = __webpack_require__(161);
 
 	/*
 	  MODEL
@@ -69,28 +69,20 @@
 	/*
 	  UPDATE
 	*/
-	var update = [[[(0, _utilsJs.filter)((0, _utilsJs.actionIs)('inc'))], function (params) {
-	  return function (state) {
-	    state.count += 1;
-	    return [state, wowEffect];
-	  };
-	}], [[(0, _utilsJs.filter)((0, _utilsJs.actionIs)('dec'))], function (params) {
-	  return function (state) {
-	    state.count -= 1;
-	    return [state];
-	  };
-	}], [[(0, _utilsJs.filter)((0, _utilsJs.actionIs)('wow')), (0, _utilsJs.debounce)(1000)], function (params) {
-	  return function (state) {
-	    state.history.push(state.count);
-	    return [state];
-	  };
+	var update = [[[(0, _helpersJs.filter)((0, _helpersJs.actionIs)('inc'))], function (params, state) {
+	  state.count += 1;
+	  return [state, wowEffect];
+	}], [[(0, _helpersJs.filter)((0, _helpersJs.actionIs)('dec'))], function (params, state) {
+	  state.count -= 1;
+	  return [state];
+	}], [[(0, _helpersJs.filter)((0, _helpersJs.actionIs)('wow')), (0, _helpersJs.debounce)(1000)], function (params, state) {
+	  state.history.push(state.count);
+	  return [state];
 	}]];
 
-	function wowEffect(state, eventStream) {
+	function wowEffect(state, es) {
 	  return Rx.Observable.just(1)['do'](function () {
-	    eventStream.onNext({
-	      action: 'wow'
-	    });
+	    es.send('wow');
 	  });
 	}
 
@@ -101,14 +93,10 @@
 	  displayName: 'Counter',
 
 	  onPlusClick: function onPlusClick() {
-	    this.props.eventStream.onNext({
-	      action: 'inc'
-	    });
+	    this.props.es.send('inc');
 	  },
 	  onMinusClick: function onMinusClick() {
-	    this.props.eventStream.onNext({
-	      action: 'dec'
-	    });
+	    this.props.es.send('dec');
 	  },
 	  render: function render() {
 	    return _react2['default'].createElement(
@@ -19695,9 +19683,13 @@
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	var _react = __webpack_require__(1);
 
@@ -19709,7 +19701,34 @@
 
 	var _rx2 = _interopRequireDefault(_rx);
 
-	var _utilsJs = __webpack_require__(161);
+	var _helpersJs = __webpack_require__(161);
+
+	var StreamWrapper = (function () {
+	  function StreamWrapper(stream) {
+	    _classCallCheck(this, StreamWrapper);
+
+	    this.stream = stream;
+	  }
+
+	  _createClass(StreamWrapper, [{
+	    key: 'send',
+	    value: function send(action, data) {
+	      this.stream.onNext({ action: action, data: data });
+	    }
+	  }]);
+
+	  return StreamWrapper;
+	})();
+
+	function carrier(fn) {
+	  for (var _len = arguments.length, first_args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    first_args[_key - 1] = arguments[_key];
+	  }
+
+	  return function () {
+	    return fn.apply(this, first_args.concat.apply(first_args, arguments));
+	  };
+	}
 
 	exports['default'] = function (model, update, View, container) {
 	  var _Rx$Observable;
@@ -19723,10 +19742,15 @@
 	    var actionHandler = _ref2[1];
 	    return actionCondition.reduce(function (accStream, cond) {
 	      return cond.call(accStream);
-	    }, eventStream).map(actionHandler);
+	    }, eventStream).map(function (params) {
+	      return function (state) {
+	        return actionHandler(params, state);
+	      };
+	    });
 	  });
 
-	  return (_Rx$Observable = _rx2['default'].Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray)).scan(function (_ref3, action) {
+	  var streamWrapper = new StreamWrapper(eventStream);
+	  var disposable = (_Rx$Observable = _rx2['default'].Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray)).scan(function (_ref3, action) {
 	    var _ref32 = _slicedToArray(_ref3, 2);
 
 	    var state = _ref32[0];
@@ -19737,14 +19761,16 @@
 
 	    var state = _ref42[0];
 	    var _ = _ref42[1];
-	    return (0, _reactDom.render)(_react2['default'].createElement(View, _extends({}, state, { eventStream: eventStream })), container);
+	    return (0, _reactDom.render)(_react2['default'].createElement(View, _extends({}, state, { es: streamWrapper })), container);
 	  }).flatMap(function (_ref5) {
 	    var _ref52 = _slicedToArray(_ref5, 2);
 
 	    var state = _ref52[0];
 	    var effect = _ref52[1];
-	    return effect ? effect(state, eventStream) : _rx2['default'].Observable.empty();
-	  }).subscribe(function () {}, console.error.bind(console));
+	    return effect ? effect(state, streamWrapper) : _rx2['default'].Observable.empty();
+	  }).subscribe(_rx2['default'].helpers.noop, console.error.bind(console));
+
+	  return { disposable: disposable, eventStream: eventStream };
 	};
 
 	module.exports = exports['default'];

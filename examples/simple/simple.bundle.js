@@ -56,7 +56,7 @@
 
 	var _simpleJs2 = _interopRequireDefault(_simpleJs);
 
-	var _utilsJs = __webpack_require__(161);
+	var _helpersJs = __webpack_require__(161);
 
 	/*
 	  MODEL
@@ -32002,7 +32002,7 @@
 
 	var _rx2 = _interopRequireDefault(_rx);
 
-	var _utilsJs = __webpack_require__(161);
+	var _helpersJs = __webpack_require__(161);
 
 	/*
 	update is an Array of pairs: [actionName, actionHandler]
@@ -32018,14 +32018,14 @@
 
 	    var actionName = _ref2[0];
 	    var actionHandler = _ref2[1];
-	    return eventStream.filter((0, _utilsJs.actionIs)(actionName)).map(actionHandler);
+	    return eventStream.filter((0, _helpersJs.actionIs)(actionName)).map(actionHandler);
 	  });
 
 	  return (_Rx$Observable = _rx2['default'].Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray)).scan(function (state, action) {
 	    return action(state);
 	  }, model).startWith(model)['do'](function (state) {
 	    return (0, _reactDom.render)(_react2['default'].createElement(View, _extends({}, state, { eventStream: eventStream })), container);
-	  }).subscribe(function () {}, console.error.bind(console));
+	  }).subscribe(_rx2['default'].helpers.noop, console.error.bind(console));
 	};
 
 	module.exports = exports['default'];
