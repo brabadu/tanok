@@ -14,15 +14,15 @@ let model = {
   UPDATE
 */
 let update = [
-  [[filter(actionIs('inc'))], (params) => (state) => {
+  [[filter(actionIs('inc'))], (params, state) => {
     state.count += 1
     return [state, wowEffect]
   }],
-  [[filter(actionIs('dec'))], (params) => (state) => {
+  [[filter(actionIs('dec'))], (params, state) => {
     state.count -= 1
     return [state]
   }],
-  [[filter(actionIs('wow')), debounce(1000)], (params) => (state) => {
+  [[filter(actionIs('wow')), debounce(1000)], (params, state) => {
     state.history.push(state.count)
     return [state]
   }]

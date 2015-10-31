@@ -13,13 +13,19 @@ class StreamWrapper {
   }
 }
 
+function carrier(fn, ...first_args) {
+  return function(...later_args) {
+    return fn.apply(this, first_args.concat(...later_args))
+  }
+}
+
 export default function(model, update, View, container) {
   let eventStream = new Rx.Subject();
 
   let dispatcherArray = update.map(([actionCondition, actionHandler]) =>
     actionCondition
       .reduce((accStream, cond) => cond.call(accStream), eventStream)
-      .map(actionHandler))
+      .map((params) => (state) => actionHandler(params, state)))
 
   const streamWrapper = new StreamWrapper(eventStream);
   let disposable = Rx.Observable
