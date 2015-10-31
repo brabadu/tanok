@@ -1,6 +1,6 @@
 import React from 'react'
 import tanok from '../../simple.js';
-import {actionIs, filter, debounce} from '../../utils.js';
+import {actionIs, filter, debounce} from '../../helpers.js';
 
 /*
   MODEL

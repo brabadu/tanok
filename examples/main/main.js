@@ -1,6 +1,6 @@
 import React from 'react'
 import tanok from '../../tanok.js';
-import {actionIs, filter, debounce} from '../../utils.js';
+import {actionIs, filter, debounce} from '../../helpers.js';
 
 /*
   MODEL
@@ -28,11 +28,9 @@ let update = [
   }]
 ]
 
-function wowEffect (state, eventStream) {
+function wowEffect (state, es) {
   return Rx.Observable.just(1).do(function(){
-    eventStream.onNext({
-      action: 'wow'
-    })
+    es.send('wow')
   })
 }
 
@@ -41,14 +39,10 @@ function wowEffect (state, eventStream) {
 */
 const Counter = React.createClass({
   onPlusClick: function() {
-    this.props.eventStream.onNext({
-      action: 'inc',
-    })
+    this.props.es.send('inc')
   },
   onMinusClick: function() {
-    this.props.eventStream.onNext({
-      action: 'dec',
-    })
+    this.props.es.send('dec')
   },
   render: function() {
         return <div>
