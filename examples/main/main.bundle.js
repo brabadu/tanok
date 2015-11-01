@@ -48,88 +48,15 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
 	var _tanokJs = __webpack_require__(157);
 
 	var _tanokJs2 = _interopRequireDefault(_tanokJs);
 
-	var _helpersJs = __webpack_require__(161);
+	var _counterJs = __webpack_require__(162);
 
-	/*
-	  MODEL
-	*/
-	var model = {
-	  count: 0,
-	  history: []
-	};
-
-	/*
-	  UPDATE
-	*/
-	var update = [[[(0, _helpersJs.actionIs)('inc')], function (params, state) {
-	  state.count += 1;
-	  return [state, wowEffect];
-	}], [[(0, _helpersJs.actionIs)('dec')], function (params, state) {
-	  state.count -= 1;
-	  return [state];
-	}], [[(0, _helpersJs.actionIs)('wow'), (0, _helpersJs.debounce)(1000)], function (params, state) {
-	  state.history.push(state.count);
-	  return [state];
-	}]];
-
-	function wowEffect(state, es) {
-	  return Rx.Observable.just(1)['do'](function () {
-	    es.send('wow');
-	  });
-	}
-
-	/*
-	  VIEW
-	*/
-	var Counter = _react2['default'].createClass({
-	  displayName: 'Counter',
-
-	  onPlusClick: function onPlusClick() {
-	    this.props.es.send('inc');
-	  },
-	  onMinusClick: function onMinusClick() {
-	    this.props.es.send('dec');
-	  },
-	  render: function render() {
-	    return _react2['default'].createElement(
-	      'div',
-	      null,
-	      _react2['default'].createElement(
-	        'button',
-	        { onClick: this.onPlusClick },
-	        '+'
-	      ),
-	      _react2['default'].createElement(
-	        'span',
-	        null,
-	        this.props.count
-	      ),
-	      _react2['default'].createElement(
-	        'button',
-	        { onClick: this.onMinusClick },
-	        '-'
-	      ),
-	      'History: [',
-	      this.props.history.join(', '),
-	      ']'
-	    );
-	  }
-	});
-
-	/*
-	  Starting the app
-	*/
 	var div = document.createElement('div');
 	document.body.appendChild(div);
-	(0, _tanokJs2['default'])(model, update, Counter, div);
+	(0, _tanokJs2['default'])((0, _counterJs.init)(), _counterJs.update, _counterJs.Counter, div);
 
 /***/ },
 /* 1 */
@@ -32075,6 +32002,98 @@
 	    return this.debounce(time);
 	  };
 	}
+
+/***/ },
+/* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.init = init;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _helpersJs = __webpack_require__(161);
+
+	/*
+	  MODEL
+	*/
+
+	function init() {
+	  return {
+	    count: 0,
+	    history: []
+	  };
+	}
+
+	;
+
+	/*
+	  UPDATE
+	*/
+	var update = [[[(0, _helpersJs.actionIs)('inc')], function (params, state) {
+	  state.count += 1;
+	  return [state, wowEffect];
+	}], [[(0, _helpersJs.actionIs)('dec')], function (params, state) {
+	  state.count -= 1;
+	  return [state];
+	}], [[(0, _helpersJs.actionIs)('wow'), (0, _helpersJs.debounce)(1000)], function (params, state) {
+	  state.history.push(state.count);
+	  return [state];
+	}]];
+
+	exports.update = update;
+	function wowEffect(state, es) {
+	  return Rx.Observable.just(1)['do'](function () {
+	    es.send('wow');
+	  });
+	}
+
+	/*
+	  VIEW
+	*/
+	var Counter = _react2['default'].createClass({
+	  displayName: 'Counter',
+
+	  onPlusClick: function onPlusClick() {
+	    this.props.es.send('inc');
+	  },
+	  onMinusClick: function onMinusClick() {
+	    this.props.es.send('dec');
+	  },
+	  render: function render() {
+	    return _react2['default'].createElement(
+	      'div',
+	      null,
+	      _react2['default'].createElement(
+	        'button',
+	        { onClick: this.onPlusClick },
+	        '+'
+	      ),
+	      _react2['default'].createElement(
+	        'span',
+	        null,
+	        this.props.count
+	      ),
+	      _react2['default'].createElement(
+	        'button',
+	        { onClick: this.onMinusClick },
+	        '-'
+	      ),
+	      'History: [',
+	      this.props.history.join(', '),
+	      ']'
+	    );
+	  }
+	});
+	exports.Counter = Counter;
 
 /***/ }
 /******/ ]);
