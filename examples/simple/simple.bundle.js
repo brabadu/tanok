@@ -31956,9 +31956,11 @@
 	exports.debounce = debounce;
 
 	function actionIs(actionName) {
-	  return function (_ref) {
-	    var action = _ref.action;
-	    return action === actionName;
+	  return function () {
+	    return this.filter(function (_ref) {
+	      var action = _ref.action;
+	      return action === actionName;
+	    });
 	  };
 	}
 

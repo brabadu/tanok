@@ -69,13 +69,13 @@
 	/*
 	  UPDATE
 	*/
-	var update = [[[(0, _helpersJs.filter)((0, _helpersJs.actionIs)('inc'))], function (params, state) {
+	var update = [[[(0, _helpersJs.actionIs)('inc')], function (params, state) {
 	  state.count += 1;
 	  return [state, wowEffect];
-	}], [[(0, _helpersJs.filter)((0, _helpersJs.actionIs)('dec'))], function (params, state) {
+	}], [[(0, _helpersJs.actionIs)('dec')], function (params, state) {
 	  state.count -= 1;
 	  return [state];
-	}], [[(0, _helpersJs.filter)((0, _helpersJs.actionIs)('wow')), (0, _helpersJs.debounce)(1000)], function (params, state) {
+	}], [[(0, _helpersJs.actionIs)('wow'), (0, _helpersJs.debounce)(1000)], function (params, state) {
 	  state.history.push(state.count);
 	  return [state];
 	}]];
@@ -19720,16 +19720,6 @@
 	  return StreamWrapper;
 	})();
 
-	function carrier(fn) {
-	  for (var _len = arguments.length, first_args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	    first_args[_key - 1] = arguments[_key];
-	  }
-
-	  return function () {
-	    return fn.apply(this, first_args.concat.apply(first_args, arguments));
-	  };
-	}
-
 	exports['default'] = function (model, update, View, container) {
 	  var _Rx$Observable;
 
@@ -32066,9 +32056,11 @@
 	exports.debounce = debounce;
 
 	function actionIs(actionName) {
-	  return function (_ref) {
-	    var action = _ref.action;
-	    return action === actionName;
+	  return function () {
+	    return this.filter(function (_ref) {
+	      var action = _ref.action;
+	      return action === actionName;
+	    });
 	  };
 	}
 
