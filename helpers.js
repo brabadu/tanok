@@ -1,5 +1,5 @@
 export function actionIs(actionName) {
-  return ({action}) => action === actionName;
+  return function() {return this.filter(({action}) => action === actionName)};
 }
 
 export function filter(cond) {
