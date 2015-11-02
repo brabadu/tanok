@@ -1,4 +1,4 @@
-import React from 'react';
+import {createElement} from 'react';
 import {render} from 'react-dom';
 import Rx from 'rx';
 import {actionIs} from './helpers.js';
@@ -26,7 +26,7 @@ export default function(model, update, View, container) {
     .merge(...dispatcherArray)
     .scan((([state, _], action) => action(state)), [model])
     .startWith([model])
-    .do(([state, _]) => render(<View {...state} es={streamWrapper} />, container))
+    .do(([state, _]) => render(createElement(View, {es: streamWrapper, ...state}), container))
     .flatMap(([state, effect]) => effect ? effect(state, streamWrapper) : Rx.Observable.empty() )
     .subscribe(
       Rx.helpers.noop,
@@ -35,3 +35,4 @@ export default function(model, update, View, container) {
 
   return {disposable, eventStream}
 }
+
