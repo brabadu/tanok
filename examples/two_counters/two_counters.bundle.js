@@ -46,17 +46,69 @@
 
 	'use strict';
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
 
 	var _tanokJs = __webpack_require__(1);
 
-	var _tanokJs2 = _interopRequireDefault(_tanokJs);
+	var _mainCounterJs = __webpack_require__(162);
 
-	var _counterJs = __webpack_require__(162);
+	var _helpersJs = __webpack_require__(161);
 
+	var model = {
+	  top: (0, _mainCounterJs.init)(),
+	  bottom: (0, _mainCounterJs.init)()
+	};
+
+	var update = [[[(0, _helpersJs.actionIs)('top')], function (params, state) {
+	  var _params$payload = params.payload(state.top);
+
+	  var _params$payload2 = _slicedToArray(_params$payload, 2);
+
+	  var newState = _params$payload2[0];
+	  var effect = _params$payload2[1];
+
+	  state.top = newState;
+	  // return [state, effectWrapper(effect, 'top')];
+	  return [state];
+	}], [[(0, _helpersJs.actionIs)('bottom')], function (params, state) {
+	  var _params$payload3 = params.payload(state.bottom);
+
+	  var _params$payload32 = _slicedToArray(_params$payload3, 2);
+
+	  var newState = _params$payload32[0];
+	  var effect = _params$payload32[1];
+
+	  state.bottom = newState;
+	  return [state, (0, _tanokJs.effectWrapper)(effect, 'bottom')];
+	}]];
+
+	var TwoCounters = _react2['default'].createClass({
+	  displayName: 'TwoCounters',
+
+	  render: function render() {
+	    return _react2['default'].createElement(
+	      'div',
+	      null,
+	      _react2['default'].createElement(_mainCounterJs.Counter, _extends({}, this.props.top, { es: this.props.es.wrap('top', _mainCounterJs.update) })),
+	      _react2['default'].createElement(_mainCounterJs.Counter, _extends({}, this.props.bottom, { es: this.props.es.wrap('bottom', _mainCounterJs.update) }))
+	    );
+	  }
+	});
+
+	/*
+	  Starting the app
+	*/
 	var div = document.createElement('div');
 	document.body.appendChild(div);
-	(0, _tanokJs2['default'])((0, _counterJs.init)(), _counterJs.update, _counterJs.Counter, div);
+	(0, _tanokJs.tanok)(model, update, TwoCounters, div);
 
 /***/ },
 /* 1 */

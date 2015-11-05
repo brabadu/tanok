@@ -1,7 +1,8 @@
 module.exports = {
     entry: {
       main: "./main/main.js",
-      simple: "./simple/simple.js"
+      simple: "./simple/simple.js",
+      two_counters: "./two_counters/two_counters.js",
     },
     output: {
         path: __dirname,
