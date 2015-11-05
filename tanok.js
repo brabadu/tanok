@@ -1,10 +1,10 @@
 import React from 'react';
 import {render} from 'react-dom';
 import Rx from 'rx';
-import {actionIs, parentIs} from './helpers.js';
+import {actionIs} from './helpers.js';
 
 class StreamWrapper {
-  constructor(stream, parent) {
+  constructor (stream, parent) {
     this.stream = stream;
     this.parent = parent;
     this.disposable = null;
@@ -27,7 +27,6 @@ class StreamWrapper {
     this.disposable = subStreamWrapper
       .dispatch(subUpdate)
       .do((stateMutator) => this.send(parent, stateMutator))
-      // .flatMap(([state, effect]) => effect ? effect(state, streamWrapper) : Rx.Observable.empty() )
       .subscribe(
         Rx.helpers.noop,
         console.error.bind(console)
@@ -36,7 +35,7 @@ class StreamWrapper {
     return subStreamWrapper;
   }
 
-  send(action, payload) {
+  send (action, payload) {
     this.stream.onNext({action, payload, parent: this.parent})
   }
 }
