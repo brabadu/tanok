@@ -52,7 +52,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _simpleJs = __webpack_require__(163);
+	var _simpleJs = __webpack_require__(164);
 
 	var _simpleJs2 = _interopRequireDefault(_simpleJs);
 
@@ -31944,17 +31944,20 @@
 
 /***/ },
 /* 161 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 	exports.actionIs = actionIs;
 	exports.parentIs = parentIs;
 	exports.filter = filter;
 	exports.debounce = debounce;
+	exports.effectWrapper = effectWrapper;
+
+	var _streamWrapper = __webpack_require__(162);
 
 	function actionIs(actionName) {
 	  return function () {
@@ -31986,9 +31989,95 @@
 	  };
 	}
 
+	function effectWrapper(effect, parent) {
+	  return function (state, _ref3) {
+	    var stream = _ref3.stream;
+	    return effect ? effect(state, new _streamWrapper.StreamWrapper(stream, parent)) : Rx.helpers.noop;
+	  };
+	}
+
 /***/ },
-/* 162 */,
-/* 163 */
+/* 162 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var StreamWrapper = (function () {
+	  function StreamWrapper(stream, parent) {
+	    _classCallCheck(this, StreamWrapper);
+
+	    this.stream = stream;
+	    this.parent = parent;
+	    this.disposable = null;
+	  }
+
+	  _createClass(StreamWrapper, [{
+	    key: "dispatch",
+	    value: function dispatch(updateHandlers) {
+	      var _Rx$Observable,
+	          _this = this;
+
+	      var parentStream = this.stream.filter(function (_ref) {
+	        var parent = _ref.parent;
+	        return parent === _this.parent;
+	      });
+
+	      var dispatcherArray = updateHandlers.map(function (_ref2) {
+	        var _ref22 = _slicedToArray(_ref2, 2);
+
+	        var actionCondition = _ref22[0];
+	        var actionHandler = _ref22[1];
+	        return actionCondition.reduce(function (accStream, cond) {
+	          return cond.call(accStream);
+	        }, parentStream).map(function (params) {
+	          return function (state) {
+	            return actionHandler(params, state);
+	          };
+	        });
+	      });
+
+	      return (_Rx$Observable = Rx.Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray));
+	    }
+	  }, {
+	    key: "subStream",
+	    value: function subStream(parent, subUpdate) {
+	      var _this2 = this;
+
+	      var subStreamWrapper = new StreamWrapper(this.stream, parent);
+
+	      this.disposable = subStreamWrapper.dispatch(subUpdate)["do"](function (stateMutator) {
+	        return _this2.send(parent, stateMutator);
+	      }).subscribe(Rx.helpers.noop, console.error.bind(console));
+
+	      return subStreamWrapper;
+	    }
+	  }, {
+	    key: "send",
+	    value: function send(action, payload) {
+	      this.stream.onNext({ action: action, payload: payload, parent: this.parent });
+	    }
+	  }]);
+
+	  return StreamWrapper;
+	})();
+
+	exports.StreamWrapper = StreamWrapper;
+
+/***/ },
+/* 163 */,
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

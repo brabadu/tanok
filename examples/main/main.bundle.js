@@ -52,7 +52,7 @@
 
 	var _tanokJs2 = _interopRequireDefault(_tanokJs);
 
-	var _counterJs = __webpack_require__(162);
+	var _counterJs = __webpack_require__(163);
 
 	var div = document.createElement('div');
 	document.body.appendChild(div);
@@ -72,16 +72,9 @@
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	exports.effectWrapper = effectWrapper;
 	exports.tanok = tanok;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	var _react = __webpack_require__(2);
 
@@ -93,97 +86,31 @@
 
 	var _rx2 = _interopRequireDefault(_rx);
 
-	var _helpersJs = __webpack_require__(161);
+	var _helpers = __webpack_require__(161);
 
-	var StreamWrapper = (function () {
-	  function StreamWrapper(stream, parent) {
-	    _classCallCheck(this, StreamWrapper);
-
-	    this.stream = stream;
-	    this.parent = parent;
-	    this.disposable = null;
-	  }
-
-	  _createClass(StreamWrapper, [{
-	    key: 'dispatch',
-	    value: function dispatch(updateHandlers) {
-	      var _Rx$Observable,
-	          _this = this;
-
-	      var parentStream = this.stream.filter(function (_ref) {
-	        var parent = _ref.parent;
-	        return parent === _this.parent;
-	      });
-
-	      var dispatcherArray = updateHandlers.map(function (_ref2) {
-	        var _ref22 = _slicedToArray(_ref2, 2);
-
-	        var actionCondition = _ref22[0];
-	        var actionHandler = _ref22[1];
-	        return actionCondition.reduce(function (accStream, cond) {
-	          return cond.call(accStream);
-	        }, parentStream).map(function (params) {
-	          return function (state) {
-	            return actionHandler(params, state);
-	          };
-	        });
-	      });
-
-	      return (_Rx$Observable = _rx2['default'].Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray));
-	    }
-	  }, {
-	    key: 'wrap',
-	    value: function wrap(parent, subUpdate) {
-	      var _this2 = this;
-
-	      var subStreamWrapper = new StreamWrapper(this.stream, parent);
-
-	      this.disposable = subStreamWrapper.dispatch(subUpdate)['do'](function (stateMutator) {
-	        return _this2.send(parent, stateMutator);
-	      })
-	      // .flatMap(([state, effect]) => effect ? effect(state, streamWrapper) : Rx.Observable.empty() )
-	      .subscribe(_rx2['default'].helpers.noop, console.error.bind(console));
-
-	      return subStreamWrapper;
-	    }
-	  }, {
-	    key: 'send',
-	    value: function send(action, payload) {
-	      this.stream.onNext({ action: action, payload: payload, parent: this.parent });
-	    }
-	  }]);
-
-	  return StreamWrapper;
-	})();
-
-	function effectWrapper(effect, parent) {
-	  return function (state, _ref3) {
-	    var stream = _ref3.stream;
-	    return effect ? effect(state, new StreamWrapper(stream, parent)) : _rx2['default'].helpers.noop;
-	  };
-	}
+	var _streamWrapper = __webpack_require__(162);
 
 	function tanok(model, update, View, container) {
 	  var eventStream = new _rx2['default'].Subject();
 
-	  var streamWrapper = new StreamWrapper(eventStream, null);
-	  var disposable = streamWrapper.dispatch(update).scan(function (_ref4, action) {
+	  var streamWrapper = new _streamWrapper.StreamWrapper(eventStream, null);
+	  var disposable = streamWrapper.dispatch(update).scan(function (_ref, action) {
+	    var _ref2 = _slicedToArray(_ref, 2);
+
+	    var state = _ref2[0];
+	    var _ = _ref2[1];
+	    return action(state);
+	  }, [model]).startWith([model])['do'](function (_ref3) {
+	    var _ref32 = _slicedToArray(_ref3, 2);
+
+	    var state = _ref32[0];
+	    var _ = _ref32[1];
+	    return (0, _reactDom.render)(_react2['default'].createElement(View, _extends({}, state, { eventStream: streamWrapper })), container);
+	  }).flatMap(function (_ref4) {
 	    var _ref42 = _slicedToArray(_ref4, 2);
 
 	    var state = _ref42[0];
-	    var _ = _ref42[1];
-	    return action(state);
-	  }, [model]).startWith([model])['do'](function (_ref5) {
-	    var _ref52 = _slicedToArray(_ref5, 2);
-
-	    var state = _ref52[0];
-	    var _ = _ref52[1];
-	    return (0, _reactDom.render)(_react2['default'].createElement(View, _extends({}, state, { es: streamWrapper })), container);
-	  }).flatMap(function (_ref6) {
-	    var _ref62 = _slicedToArray(_ref6, 2);
-
-	    var state = _ref62[0];
-	    var effect = _ref62[1];
+	    var effect = _ref42[1];
 	    return effect ? effect(state, streamWrapper) : _rx2['default'].Observable.empty();
 	  }).subscribe(_rx2['default'].helpers.noop, console.error.bind(console));
 
@@ -32009,17 +31936,20 @@
 
 /***/ },
 /* 161 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 	exports.actionIs = actionIs;
 	exports.parentIs = parentIs;
 	exports.filter = filter;
 	exports.debounce = debounce;
+	exports.effectWrapper = effectWrapper;
+
+	var _streamWrapper = __webpack_require__(162);
 
 	function actionIs(actionName) {
 	  return function () {
@@ -32051,8 +31981,94 @@
 	  };
 	}
 
+	function effectWrapper(effect, parent) {
+	  return function (state, _ref3) {
+	    var stream = _ref3.stream;
+	    return effect ? effect(state, new _streamWrapper.StreamWrapper(stream, parent)) : Rx.helpers.noop;
+	  };
+	}
+
 /***/ },
 /* 162 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var StreamWrapper = (function () {
+	  function StreamWrapper(stream, parent) {
+	    _classCallCheck(this, StreamWrapper);
+
+	    this.stream = stream;
+	    this.parent = parent;
+	    this.disposable = null;
+	  }
+
+	  _createClass(StreamWrapper, [{
+	    key: "dispatch",
+	    value: function dispatch(updateHandlers) {
+	      var _Rx$Observable,
+	          _this = this;
+
+	      var parentStream = this.stream.filter(function (_ref) {
+	        var parent = _ref.parent;
+	        return parent === _this.parent;
+	      });
+
+	      var dispatcherArray = updateHandlers.map(function (_ref2) {
+	        var _ref22 = _slicedToArray(_ref2, 2);
+
+	        var actionCondition = _ref22[0];
+	        var actionHandler = _ref22[1];
+	        return actionCondition.reduce(function (accStream, cond) {
+	          return cond.call(accStream);
+	        }, parentStream).map(function (params) {
+	          return function (state) {
+	            return actionHandler(params, state);
+	          };
+	        });
+	      });
+
+	      return (_Rx$Observable = Rx.Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray));
+	    }
+	  }, {
+	    key: "subStream",
+	    value: function subStream(parent, subUpdate) {
+	      var _this2 = this;
+
+	      var subStreamWrapper = new StreamWrapper(this.stream, parent);
+
+	      this.disposable = subStreamWrapper.dispatch(subUpdate)["do"](function (stateMutator) {
+	        return _this2.send(parent, stateMutator);
+	      }).subscribe(Rx.helpers.noop, console.error.bind(console));
+
+	      return subStreamWrapper;
+	    }
+	  }, {
+	    key: "send",
+	    value: function send(action, payload) {
+	      this.stream.onNext({ action: action, payload: payload, parent: this.parent });
+	    }
+	  }]);
+
+	  return StreamWrapper;
+	})();
+
+	exports.StreamWrapper = StreamWrapper;
+
+/***/ },
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32067,6 +32083,10 @@
 	var _react = __webpack_require__(2);
 
 	var _react2 = _interopRequireDefault(_react);
+
+	var _mixinJs = __webpack_require__(165);
+
+	var _mixinJs2 = _interopRequireDefault(_mixinJs);
 
 	var _helpersJs = __webpack_require__(161);
 
@@ -32110,11 +32130,13 @@
 	var Counter = _react2['default'].createClass({
 	  displayName: 'Counter',
 
+	  mixins: [_mixinJs2['default']],
+
 	  onPlusClick: function onPlusClick() {
-	    this.props.es.send('inc');
+	    this.send('inc');
 	  },
 	  onMinusClick: function onMinusClick() {
-	    this.props.es.send('dec');
+	    this.send('dec');
 	  },
 	  render: function render() {
 	    return _react2['default'].createElement(
@@ -32142,6 +32164,42 @@
 	  }
 	});
 	exports.Counter = Counter;
+
+/***/ },
+/* 164 */,
+/* 165 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _streamWrapper = __webpack_require__(162);
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var TanokMixin = {
+	  propTypes: {
+	    eventStream: _react2['default'].PropTypes.instanceOf(_streamWrapper.StreamWrapper).isRequired
+	  },
+
+	  send: function send(action, payload) {
+	    this.props.eventStream.send(action, payload);
+	  },
+
+	  subStream: function subStream(parent, updateHandlers) {
+	    return this.props.eventStream.subStream(parent, updateHandlers);
+	  }
+	};
+
+	exports['default'] = TanokMixin;
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ]);

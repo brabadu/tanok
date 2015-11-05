@@ -1,8 +1,9 @@
 import React from 'react';
-import {tanok, effectWrapper} from '../../tanok.js';
+import {tanok} from '../../tanok.js';
+import TanokMixin from '../../mixin.js';
 import {init as counterInit,
         update as counterUpdate, Counter} from '../main/counter.js';
-import {actionIs, parentIs} from '../../helpers.js';
+import {actionIs, effectWrapper} from '../../helpers.js';
 
 
 let model = {
@@ -14,8 +15,7 @@ let update = [
   [[actionIs('top')], (params, state) => {
     let [newState, effect] = params.payload(state.top);
     state.top = newState
-    // return [state, effectWrapper(effect, 'top')];
-    return [state];
+    return [state, effectWrapper(effect, 'top')];
   }],
   [[actionIs('bottom')], (params, state) => {
     let [newState, effect] = params.payload(state.bottom);
@@ -25,10 +25,12 @@ let update = [
 ]
 
 const TwoCounters = React.createClass({
+  mixins: [TanokMixin],
+
   componentWillMount: function() {
     this.setState({
-      topEs: this.props.es.wrap('top', counterUpdate),
-      bottomEs: this.props.es.wrap('bottom', counterUpdate)
+      topEs: this.subStream('top', counterUpdate),
+      bottomEs: this.subStream('bottom', counterUpdate)
     })
   },
   componentWillUnmount: function () {
@@ -37,8 +39,8 @@ const TwoCounters = React.createClass({
   },
   render: function() {
         return <div>
-          <Counter {...this.props.top} es={this.state.topEs} />
-          <Counter {...this.props.bottom} es={this.state.bottomEs} />
+          <Counter {...this.props.top} eventStream={this.state.topEs} />
+          <Counter {...this.props.bottom} eventStream={this.state.bottomEs} />
         </div>
     }
 });

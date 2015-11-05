@@ -1,4 +1,5 @@
 import React from 'react'
+import TanokMixin from '../../mixin.js';
 import {actionIs, filter, debounce} from '../../helpers.js';
 
 /*
@@ -39,11 +40,13 @@ function wowEffect (state, es) {
   VIEW
 */
 export const Counter = React.createClass({
+  mixins: [TanokMixin],
+
   onPlusClick: function() {
-    this.props.es.send('inc')
+    this.send('inc')
   },
   onMinusClick: function() {
-    this.props.es.send('dec')
+    this.send('dec')
   },
   render: function() {
         return <div>
