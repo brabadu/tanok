@@ -25,10 +25,20 @@ let update = [
 ]
 
 const TwoCounters = React.createClass({
+  componentWillMount: function() {
+    this.setState({
+      topEs: this.props.es.wrap('top', counterUpdate),
+      bottomEs: this.props.es.wrap('bottom', counterUpdate)
+    })
+  },
+  componentWillUnmount: function () {
+    this.state.topEs.disposable();
+    this.state.bottomEs.disposable();
+  },
   render: function() {
         return <div>
-          <Counter {...this.props.top} es={this.props.es.wrap('top', counterUpdate)} />
-          <Counter {...this.props.bottom} es={this.props.es.wrap('bottom', counterUpdate)} />
+          <Counter {...this.props.top} es={this.state.topEs} />
+          <Counter {...this.props.bottom} es={this.state.bottomEs} />
         </div>
     }
 });

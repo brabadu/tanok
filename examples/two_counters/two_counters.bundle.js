@@ -93,12 +93,22 @@
 	var TwoCounters = _react2['default'].createClass({
 	  displayName: 'TwoCounters',
 
+	  componentWillMount: function componentWillMount() {
+	    this.setState({
+	      topEs: this.props.es.wrap('top', _mainCounterJs.update),
+	      bottomEs: this.props.es.wrap('bottom', _mainCounterJs.update)
+	    });
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    this.state.topEs.disposable();
+	    this.state.bottomEs.disposable();
+	  },
 	  render: function render() {
 	    return _react2['default'].createElement(
 	      'div',
 	      null,
-	      _react2['default'].createElement(_mainCounterJs.Counter, _extends({}, this.props.top, { es: this.props.es.wrap('top', _mainCounterJs.update) })),
-	      _react2['default'].createElement(_mainCounterJs.Counter, _extends({}, this.props.bottom, { es: this.props.es.wrap('bottom', _mainCounterJs.update) }))
+	      _react2['default'].createElement(_mainCounterJs.Counter, _extends({}, this.props.top, { es: this.state.topEs })),
+	      _react2['default'].createElement(_mainCounterJs.Counter, _extends({}, this.props.bottom, { es: this.state.bottomEs }))
 	    );
 	  }
 	});
@@ -153,6 +163,7 @@
 
 	    this.stream = stream;
 	    this.parent = parent;
+	    this.disposable = null;
 	  }
 
 	  _createClass(StreamWrapper, [{
@@ -189,7 +200,7 @@
 
 	      var subStreamWrapper = new StreamWrapper(this.stream, parent);
 
-	      subStreamWrapper.dispatch(subUpdate)['do'](function (stateMutator) {
+	      this.disposable = subStreamWrapper.dispatch(subUpdate)['do'](function (stateMutator) {
 	        return _this2.send(parent, stateMutator);
 	      })
 	      // .flatMap(([state, effect]) => effect ? effect(state, streamWrapper) : Rx.Observable.empty() )

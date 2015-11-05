@@ -7,6 +7,7 @@ class StreamWrapper {
   constructor(stream, parent) {
     this.stream = stream;
     this.parent = parent;
+    this.disposable = null;
   };
 
   dispatch (updateHandlers) {
@@ -23,7 +24,7 @@ class StreamWrapper {
   wrap (parent, subUpdate) {
     let subStreamWrapper = new StreamWrapper(this.stream, parent);
 
-    subStreamWrapper
+    this.disposable = subStreamWrapper
       .dispatch(subUpdate)
       .do((stateMutator) => this.send(parent, stateMutator))
       // .flatMap(([state, effect]) => effect ? effect(state, streamWrapper) : Rx.Observable.empty() )

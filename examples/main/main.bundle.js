@@ -101,6 +101,7 @@
 
 	    this.stream = stream;
 	    this.parent = parent;
+	    this.disposable = null;
 	  }
 
 	  _createClass(StreamWrapper, [{
@@ -137,7 +138,7 @@
 
 	      var subStreamWrapper = new StreamWrapper(this.stream, parent);
 
-	      subStreamWrapper.dispatch(subUpdate)['do'](function (stateMutator) {
+	      this.disposable = subStreamWrapper.dispatch(subUpdate)['do'](function (stateMutator) {
 	        return _this2.send(parent, stateMutator);
 	      })
 	      // .flatMap(([state, effect]) => effect ? effect(state, streamWrapper) : Rx.Observable.empty() )
