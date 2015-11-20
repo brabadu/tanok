@@ -22,7 +22,7 @@ export let update = [
   }],
   [[actionIs('dec')], (params, state) => {
     state.count -= 1
-    return [state]
+    return [state, wowEffect]
   }],
   [[actionIs('wow'), debounce(1000)], (params, state) => {
     state.history.push(state.count)
