@@ -1,4 +1,4 @@
-import {StreamWrapper} from './streamWrapper'
+import {StreamWrapper} from './streamWrapper.js'
 
 export function actionIs(actionName) {
   return function() {return this.filter(({action}) => action === actionName)};

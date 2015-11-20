@@ -1,4 +1,4 @@
-import {StreamWrapper} from './streamWrapper'
+import {StreamWrapper} from './streamWrapper.js'
 import React from 'react';
 
 const TanokMixin = {

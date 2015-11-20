@@ -1,7 +1,9 @@
+path = require('path')
+
 module.exports = {
     entry: {
       main: "./main/main.js",
-      simple: "./simple/simple.js",
+      simple: ['babel-polyfill', "./simple/simple.js"],
       two_counters: "./two_counters/two_counters.js",
     },
     output: {
@@ -10,12 +12,14 @@ module.exports = {
     },
     module: {
         loaders: [
-            { test: /\.css$/, loader: "style!css" },
-            {
-              test: /\.jsx?$/,
-              exclude: /(node_modules|bower_components)/,
-              loader: 'babel'
+          {
+            test: /\.jsx?$/,
+            loader: 'babel-loader',
+            exclude: /node_modules/,
+            query: {
+                presets: ['es2015', 'react']
             }
+          }
         ]
     }
 };
