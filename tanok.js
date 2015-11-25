@@ -5,6 +5,11 @@ import {actionIs} from './helpers.js';
 import {StreamWrapper} from './streamWrapper.js';
 
 export function tanok (initialState, update, View, container) {
+  if (!container) {
+      container = document.createElement('div');
+      document.body.appendChild(container);
+  }
+
   let eventStream = new Rx.Subject();
 
   const streamWrapper = new StreamWrapper(eventStream, null);
@@ -18,6 +23,7 @@ export function tanok (initialState, update, View, container) {
       console.error.bind(console)
     );
 
+  streamWrapper.send('init');
 
   return {disposable, eventStream}
 }

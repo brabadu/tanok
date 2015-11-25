@@ -16,6 +16,10 @@ export function init() {
   UPDATE
 */
 export let update = [
+  [[actionIs('init')], (params, state) => {
+    state.count = 555;
+    return [state];
+  }],
   [[actionIs('inc')], (params, state) => {
     state.count += 1
     return [state, wowEffect]
