@@ -1,9 +1,9 @@
 import React from 'react';
-import {tanok} from '../../tanok.js';
+import {tanok, effectWrapper} from '../../tanok.js';
 import TanokMixin from '../../mixin.js';
 import {init as counterInit,
         update as counterUpdate, Counter} from '../main/counter.js';
-import {actionIs, effectWrapper} from '../../helpers.js';
+import {actionIs} from '../../helpers.js';
 
 
 let model = {

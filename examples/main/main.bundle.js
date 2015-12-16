@@ -73,6 +73,7 @@
 	});
 	exports.default = undefined;
 	exports.tanok = tanok;
+	exports.effectWrapper = effectWrapper;
 
 	var _react = __webpack_require__(2);
 
@@ -122,6 +123,13 @@
 	  streamWrapper.send('init');
 
 	  return { disposable: disposable, eventStream: eventStream };
+	}
+
+	function effectWrapper(effect, parent) {
+	  return function (state, _ref7) {
+	    var stream = _ref7.stream;
+	    return effect ? effect(state, new _streamWrapper.StreamWrapper(stream, parent)) : _rx2.default.helpers.noop;
+	  };
 	}
 
 	exports.default = tanok;
@@ -176,6 +184,7 @@
 	});
 
 	React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOM;
+	React.__SECRET_DOM_SERVER_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOMServer;
 
 	module.exports = React;
 
@@ -10526,6 +10535,7 @@
 	    multiple: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
 	    muted: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
 	    name: null,
+	    nonce: MUST_USE_ATTRIBUTE,
 	    noValidate: HAS_BOOLEAN_VALUE,
 	    open: HAS_BOOLEAN_VALUE,
 	    optimum: null,
@@ -10537,6 +10547,7 @@
 	    readOnly: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
 	    rel: null,
 	    required: HAS_BOOLEAN_VALUE,
+	    reversed: HAS_BOOLEAN_VALUE,
 	    role: MUST_USE_ATTRIBUTE,
 	    rows: MUST_USE_ATTRIBUTE | HAS_POSITIVE_NUMERIC_VALUE,
 	    rowSpan: null,
@@ -18739,7 +18750,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.2';
+	module.exports = '0.14.3';
 
 /***/ },
 /* 148 */
@@ -31930,9 +31941,9 @@
 
 /***/ },
 /* 162 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -31941,10 +31952,6 @@
 	exports.parentIs = parentIs;
 	exports.filter = filter;
 	exports.debounce = debounce;
-	exports.effectWrapper = effectWrapper;
-
-	var _streamWrapper = __webpack_require__(163);
-
 	function actionIs(actionName) {
 	  return function () {
 	    return this.filter(function (_ref) {
@@ -31975,18 +31982,11 @@
 	  };
 	}
 
-	function effectWrapper(effect, parent) {
-	  return function (state, _ref3) {
-	    var stream = _ref3.stream;
-	    return effect ? effect(state, new _streamWrapper.StreamWrapper(stream, parent)) : Rx.helpers.noop;
-	  };
-	}
-
 /***/ },
 /* 163 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
@@ -31995,10 +31995,25 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.StreamWrapper = undefined;
+
+	var _helpers = __webpack_require__(162);
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function maybeWrapArray(something) {
+	  return Array.isArray(something) ? something : [something];
+	}
+
+	function isFunction(x) {
+	  return Object.prototype.toString.call(x) == '[object Function]';
+	}
+
+	function maybeWrapActionIs(condition) {
+	  return isFunction(condition) ? condition : (0, _helpers.actionIs)(condition);
+	}
 
 	var StreamWrapper = exports.StreamWrapper = (function () {
 	  function StreamWrapper(stream, parent) {
@@ -32010,7 +32025,7 @@
 	  }
 
 	  _createClass(StreamWrapper, [{
-	    key: "dispatch",
+	    key: 'dispatch',
 	    value: function dispatch(updateHandlers) {
 	      var _this = this,
 	          _Rx$Observable;
@@ -32025,8 +32040,8 @@
 
 	        var actionCondition = _ref3[0];
 	        var actionHandler = _ref3[1];
-	        return actionCondition.reduce(function (accStream, cond) {
-	          return cond.call(accStream);
+	        return maybeWrapArray(actionCondition).reduce(function (accStream, cond) {
+	          return maybeWrapActionIs(cond).call(accStream);
 	        }, parentStream).map(function (params) {
 	          return function (state) {
 	            return actionHandler(params, state);
@@ -32037,7 +32052,7 @@
 	      return (_Rx$Observable = Rx.Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray));
 	    }
 	  }, {
-	    key: "subStream",
+	    key: 'subStream',
 	    value: function subStream(parent, subUpdate) {
 	      var _this2 = this;
 
@@ -32050,7 +32065,7 @@
 	      return subStreamWrapper;
 	    }
 	  }, {
-	    key: "send",
+	    key: 'send',
 	    value: function send(action, payload) {
 	      this.stream.onNext({ action: action, payload: payload, parent: this.parent });
 	    }
@@ -32065,6 +32080,8 @@
 
 	'use strict';
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -32075,13 +32092,19 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _mixin = __webpack_require__(356);
+	var _component = __webpack_require__(165);
 
-	var _mixin2 = _interopRequireDefault(_mixin);
+	var _component2 = _interopRequireDefault(_component);
 
 	var _helpers = __webpack_require__(162);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	/*
 	  MODEL
@@ -32096,7 +32119,7 @@
 	/*
 	  UPDATE
 	*/
-	var update = exports.update = [[[(0, _helpers.actionIs)('init')], function (params, state) {
+	var update = exports.update = [['init', function (params, state) {
 	  state.count = 555;
 	  return [state];
 	}], [[(0, _helpers.actionIs)('inc')], function (params, state) {
@@ -32119,243 +32142,73 @@
 	/*
 	  VIEW
 	*/
-	var Counter = exports.Counter = _react2.default.createClass({
-	  displayName: 'Counter',
 
-	  mixins: [_mixin2.default],
+	var Counter = (function (_React$Component) {
+	  _inherits(Counter, _React$Component);
 
-	  onPlusClick: function onPlusClick() {
-	    this.send('inc');
-	  },
-	  onMinusClick: function onMinusClick() {
-	    this.send('dec');
-	  },
-	  render: function render() {
-	    return _react2.default.createElement(
-	      'div',
-	      null,
-	      _react2.default.createElement(
-	        'button',
-	        { onClick: this.onPlusClick },
-	        '+'
-	      ),
-	      _react2.default.createElement(
-	        'span',
-	        null,
-	        this.props.count
-	      ),
-	      _react2.default.createElement(
-	        'button',
-	        { onClick: this.onMinusClick },
-	        '-'
-	      ),
-	      'History: [',
-	      this.props.history.join(', '),
-	      ']'
-	    );
+	  function Counter() {
+	    _classCallCheck(this, Counter);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Counter).apply(this, arguments));
 	  }
-	});
+
+	  _createClass(Counter, [{
+	    key: 'onPlusClick',
+	    value: function onPlusClick() {
+	      this.send('inc');
+	    }
+	  }, {
+	    key: 'onMinusClick',
+	    value: function onMinusClick() {
+	      this.send('dec');
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'button',
+	          { onClick: this.onPlusClick.bind(this) },
+	          '+'
+	        ),
+	        _react2.default.createElement(
+	          'span',
+	          null,
+	          this.props.count
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { onClick: this.onMinusClick.bind(this) },
+	          '-'
+	        ),
+	        'History: [',
+	        this.props.history.join(', '),
+	        ']'
+	      );
+	    }
+	  }]);
+
+	  return Counter;
+	})(_react2.default.Component);
+
+	var TCounter = (0, _component2.default)(Counter);
+
+	exports.Counter = TCounter;
 
 /***/ },
-/* 165 */,
-/* 166 */,
-/* 167 */,
-/* 168 */,
-/* 169 */,
-/* 170 */,
-/* 171 */,
-/* 172 */,
-/* 173 */,
-/* 174 */,
-/* 175 */,
-/* 176 */,
-/* 177 */,
-/* 178 */,
-/* 179 */,
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */,
-/* 192 */,
-/* 193 */,
-/* 194 */,
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */,
-/* 201 */,
-/* 202 */,
-/* 203 */,
-/* 204 */,
-/* 205 */,
-/* 206 */,
-/* 207 */,
-/* 208 */,
-/* 209 */,
-/* 210 */,
-/* 211 */,
-/* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */,
-/* 217 */,
-/* 218 */,
-/* 219 */,
-/* 220 */,
-/* 221 */,
-/* 222 */,
-/* 223 */,
-/* 224 */,
-/* 225 */,
-/* 226 */,
-/* 227 */,
-/* 228 */,
-/* 229 */,
-/* 230 */,
-/* 231 */,
-/* 232 */,
-/* 233 */,
-/* 234 */,
-/* 235 */,
-/* 236 */,
-/* 237 */,
-/* 238 */,
-/* 239 */,
-/* 240 */,
-/* 241 */,
-/* 242 */,
-/* 243 */,
-/* 244 */,
-/* 245 */,
-/* 246 */,
-/* 247 */,
-/* 248 */,
-/* 249 */,
-/* 250 */,
-/* 251 */,
-/* 252 */,
-/* 253 */,
-/* 254 */,
-/* 255 */,
-/* 256 */,
-/* 257 */,
-/* 258 */,
-/* 259 */,
-/* 260 */,
-/* 261 */,
-/* 262 */,
-/* 263 */,
-/* 264 */,
-/* 265 */,
-/* 266 */,
-/* 267 */,
-/* 268 */,
-/* 269 */,
-/* 270 */,
-/* 271 */,
-/* 272 */,
-/* 273 */,
-/* 274 */,
-/* 275 */,
-/* 276 */,
-/* 277 */,
-/* 278 */,
-/* 279 */,
-/* 280 */,
-/* 281 */,
-/* 282 */,
-/* 283 */,
-/* 284 */,
-/* 285 */,
-/* 286 */,
-/* 287 */,
-/* 288 */,
-/* 289 */,
-/* 290 */,
-/* 291 */,
-/* 292 */,
-/* 293 */,
-/* 294 */,
-/* 295 */,
-/* 296 */,
-/* 297 */,
-/* 298 */,
-/* 299 */,
-/* 300 */,
-/* 301 */,
-/* 302 */,
-/* 303 */,
-/* 304 */,
-/* 305 */,
-/* 306 */,
-/* 307 */,
-/* 308 */,
-/* 309 */,
-/* 310 */,
-/* 311 */,
-/* 312 */,
-/* 313 */,
-/* 314 */,
-/* 315 */,
-/* 316 */,
-/* 317 */,
-/* 318 */,
-/* 319 */,
-/* 320 */,
-/* 321 */,
-/* 322 */,
-/* 323 */,
-/* 324 */,
-/* 325 */,
-/* 326 */,
-/* 327 */,
-/* 328 */,
-/* 329 */,
-/* 330 */,
-/* 331 */,
-/* 332 */,
-/* 333 */,
-/* 334 */,
-/* 335 */,
-/* 336 */,
-/* 337 */,
-/* 338 */,
-/* 339 */,
-/* 340 */,
-/* 341 */,
-/* 342 */,
-/* 343 */,
-/* 344 */,
-/* 345 */,
-/* 346 */,
-/* 347 */,
-/* 348 */,
-/* 349 */,
-/* 350 */,
-/* 351 */,
-/* 352 */,
-/* 353 */,
-/* 354 */,
-/* 355 */,
-/* 356 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.default = Wrapper;
 
 	var _streamWrapper = __webpack_require__(163);
 
@@ -32365,21 +32218,46 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var TanokMixin = {
-	  propTypes: {
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	function Wrapper(Wrapped) {
+	  var TanokComponent = (function (_React$Component) {
+	    _inherits(TanokComponent, _React$Component);
+
+	    function TanokComponent(props) {
+	      _classCallCheck(this, TanokComponent);
+
+	      return _possibleConstructorReturn(this, Object.getPrototypeOf(TanokComponent).call(this, props));
+	    }
+
+	    _createClass(TanokComponent, [{
+	      key: 'render',
+	      value: function render() {
+	        return _react2.default.createElement(Wrapped, this.props);
+	      }
+	    }]);
+
+	    return TanokComponent;
+	  })(_react2.default.Component);
+
+	  TanokComponent.propTypes = {
 	    eventStream: _react2.default.PropTypes.instanceOf(_streamWrapper.StreamWrapper).isRequired
-	  },
+	  };
 
-	  send: function send(action, payload) {
+	  Wrapped.prototype.send = function (action, payload) {
 	    this.props.eventStream.send(action, payload);
-	  },
+	  };
 
-	  subStream: function subStream(parent, updateHandlers) {
+	  Wrapped.prototype.subStream = function (parent, updateHandlers) {
 	    return this.props.eventStream.subStream(parent, updateHandlers);
-	  }
-	};
+	  };
 
-	exports.default = TanokMixin;
+	  return TanokComponent;
+	};
 
 /***/ }
 /******/ ]);

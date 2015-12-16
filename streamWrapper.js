@@ -1,3 +1,17 @@
+import {actionIs} from './helpers.js';
+
+function maybeWrapArray(something) {
+  return Array.isArray(something) ? something : [something];
+}
+
+function isFunction(x) {
+  return Object.prototype.toString.call(x) == '[object Function]';
+}
+
+function maybeWrapActionIs(condition) {
+  return isFunction(condition) ? condition : actionIs(condition)
+}
+
 export class StreamWrapper {
   constructor (stream, parent) {
     this.stream = stream;
@@ -9,8 +23,8 @@ export class StreamWrapper {
     let parentStream = this.stream.filter(({parent}) => parent === this.parent)
 
     let dispatcherArray = updateHandlers.map(([actionCondition, actionHandler]) =>
-      actionCondition
-        .reduce((accStream, cond) => cond.call(accStream), parentStream)
+      maybeWrapArray(actionCondition)
+        .reduce((accStream, cond) => maybeWrapActionIs(cond).call(accStream), parentStream)
         .map((params) => (state) => actionHandler(params, state)))
 
     return Rx.Observable.merge(...dispatcherArray);

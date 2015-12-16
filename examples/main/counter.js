@@ -1,5 +1,4 @@
 import React from 'react'
-// import TanokMixin from '../../mixin.js';
 import TanokWrapper from '../../component.js';
 import {actionIs, filter, debounce} from '../../helpers.js';
 
@@ -17,7 +16,7 @@ export function init() {
   UPDATE
 */
 export let update = [
-  [[actionIs('init')], (params, state) => {
+  ['init', (params, state) => {
     state.count = 555;
     return [state];
   }],

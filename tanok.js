@@ -28,4 +28,10 @@ export function tanok (initialState, update, View, container) {
   return {disposable, eventStream}
 }
 
-export { tanok as default };
+export function effectWrapper(effect, parent) {
+  return (state, {stream}) => effect
+    ? effect(state, new StreamWrapper(stream, parent))
+    : Rx.helpers.noop
+}
+
+export { tanok as default};
