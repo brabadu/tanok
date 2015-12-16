@@ -19,22 +19,10 @@ export class StreamWrapper {
     this.disposable = null;
   };
 
-  dispatch (updateHandlers) {
-    let parentStream = this.stream.filter(({parent}) => parent === this.parent)
-
-    let dispatcherArray = updateHandlers.map(([actionCondition, actionHandler]) =>
-      maybeWrapArray(actionCondition)
-        .reduce((accStream, cond) => maybeWrapActionIs(cond).call(accStream), parentStream)
-        .map((params) => (state) => actionHandler(params, state)))
-
-    return Rx.Observable.merge(...dispatcherArray);
-  }
-
   subStream (parent, subUpdate) {
     let subStreamWrapper = new StreamWrapper(this.stream, parent);
 
-    this.disposable = subStreamWrapper
-      .dispatch(subUpdate)
+    this.disposable = dispatch(this.stream, subUpdate, parent)
       .do((stateMutator) => this.send(parent, stateMutator))
       .subscribe(
         Rx.helpers.noop,
@@ -47,4 +35,14 @@ export class StreamWrapper {
   send (action, payload) {
     this.stream.onNext({action, payload, parent: this.parent})
   }
+}
+
+export function dispatch(stream, updateHandlers, filterParent) {
+  let parentStream = stream.filter(({parent}) => parent === filterParent);
+  let dispatcherArray = updateHandlers.map(([actionCondition, actionHandler]) =>
+    maybeWrapArray(actionCondition)
+      .reduce((accStream, cond) => maybeWrapActionIs(cond).call(accStream), parentStream)
+      .map((params) => (state) => actionHandler(params, state)));
+
+  return Rx.Observable.merge(...dispatcherArray);
 }

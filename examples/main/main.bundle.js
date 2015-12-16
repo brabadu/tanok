@@ -85,38 +85,45 @@
 
 	var _rx2 = _interopRequireDefault(_rx);
 
-	var _helpers = __webpack_require__(162);
-
-	var _streamWrapper = __webpack_require__(163);
+	var _streamWrapper = __webpack_require__(162);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function tanok(initialState, update, View, container) {
+	function tanok(initialState, update, View, _ref) {
+	  var container = _ref.container;
+	  var outerEventStream = _ref.outerEventStream;
+
 	  if (!container) {
 	    container = document.createElement('div');
 	    document.body.appendChild(container);
 	  }
 
 	  var eventStream = new _rx2.default.Subject();
+	  var rootParent = null;
+	  var dispatcher = (0, _streamWrapper.dispatch)(eventStream, update, rootParent);
 
-	  var streamWrapper = new _streamWrapper.StreamWrapper(eventStream, null);
-	  var disposable = streamWrapper.dispatch(update).scan(function (_ref, action) {
-	    var _ref2 = _slicedToArray(_ref, 2);
+	  if (outerEventStream) {
+	    dispatcher = _rx2.default.Observable.merge(dispatcher, (0, _streamWrapper.dispatch)(outerEventStream, update, rootParent));
+	  }
+	  var streamWrapper = new _streamWrapper.StreamWrapper(eventStream, rootParent);
 
-	    var state = _ref2[0];
-	    var _ = _ref2[1];
+	  var disposable = dispatcher.scan(function (_ref2, action) {
+	    var _ref3 = _slicedToArray(_ref2, 2);
+
+	    var state = _ref3[0];
+	    var _ = _ref3[1];
 	    return action(state);
-	  }, [initialState]).startWith([initialState]).do(function (_ref3) {
-	    var _ref4 = _slicedToArray(_ref3, 2);
+	  }, [initialState]).startWith([initialState]).do(function (_ref4) {
+	    var _ref5 = _slicedToArray(_ref4, 2);
 
-	    var state = _ref4[0];
-	    var _ = _ref4[1];
+	    var state = _ref5[0];
+	    var _ = _ref5[1];
 	    return (0, _reactDom.render)(_react2.default.createElement(View, _extends({}, state, { eventStream: streamWrapper })), container);
-	  }).flatMap(function (_ref5) {
-	    var _ref6 = _slicedToArray(_ref5, 2);
+	  }).flatMap(function (_ref6) {
+	    var _ref7 = _slicedToArray(_ref6, 2);
 
-	    var state = _ref6[0];
-	    var effect = _ref6[1];
+	    var state = _ref7[0];
+	    var effect = _ref7[1];
 	    return effect ? effect(state, streamWrapper) : _rx2.default.Observable.empty();
 	  }).subscribe(_rx2.default.helpers.noop, console.error.bind(console));
 
@@ -126,8 +133,8 @@
 	}
 
 	function effectWrapper(effect, parent) {
-	  return function (state, _ref7) {
-	    var stream = _ref7.stream;
+	  return function (state, _ref8) {
+	    var stream = _ref8.stream;
 	    return effect ? effect(state, new _streamWrapper.StreamWrapper(stream, parent)) : _rx2.default.helpers.noop;
 	  };
 	}
@@ -31941,6 +31948,96 @@
 
 /***/ },
 /* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.StreamWrapper = undefined;
+	exports.dispatch = dispatch;
+
+	var _helpers = __webpack_require__(163);
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function maybeWrapArray(something) {
+	  return Array.isArray(something) ? something : [something];
+	}
+
+	function isFunction(x) {
+	  return Object.prototype.toString.call(x) == '[object Function]';
+	}
+
+	function maybeWrapActionIs(condition) {
+	  return isFunction(condition) ? condition : (0, _helpers.actionIs)(condition);
+	}
+
+	var StreamWrapper = exports.StreamWrapper = (function () {
+	  function StreamWrapper(stream, parent) {
+	    _classCallCheck(this, StreamWrapper);
+
+	    this.stream = stream;
+	    this.parent = parent;
+	    this.disposable = null;
+	  }
+
+	  _createClass(StreamWrapper, [{
+	    key: 'subStream',
+	    value: function subStream(parent, subUpdate) {
+	      var _this = this;
+
+	      var subStreamWrapper = new StreamWrapper(this.stream, parent);
+
+	      this.disposable = dispatch(this.stream, subUpdate, parent).do(function (stateMutator) {
+	        return _this.send(parent, stateMutator);
+	      }).subscribe(Rx.helpers.noop, console.error.bind(console));
+
+	      return subStreamWrapper;
+	    }
+	  }, {
+	    key: 'send',
+	    value: function send(action, payload) {
+	      this.stream.onNext({ action: action, payload: payload, parent: this.parent });
+	    }
+	  }]);
+
+	  return StreamWrapper;
+	})();
+
+	function dispatch(stream, updateHandlers, filterParent) {
+	  var _Rx$Observable;
+
+	  var parentStream = stream.filter(function (_ref) {
+	    var parent = _ref.parent;
+	    return parent === filterParent;
+	  });
+	  var dispatcherArray = updateHandlers.map(function (_ref2) {
+	    var _ref3 = _slicedToArray(_ref2, 2);
+
+	    var actionCondition = _ref3[0];
+	    var actionHandler = _ref3[1];
+	    return maybeWrapArray(actionCondition).reduce(function (accStream, cond) {
+	      return maybeWrapActionIs(cond).call(accStream);
+	    }, parentStream).map(function (params) {
+	      return function (state) {
+	        return actionHandler(params, state);
+	      };
+	    });
+	  });
+
+	  return (_Rx$Observable = Rx.Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray));
+	}
+
+/***/ },
+/* 163 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -31983,98 +32080,6 @@
 	}
 
 /***/ },
-/* 163 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.StreamWrapper = undefined;
-
-	var _helpers = __webpack_require__(162);
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function maybeWrapArray(something) {
-	  return Array.isArray(something) ? something : [something];
-	}
-
-	function isFunction(x) {
-	  return Object.prototype.toString.call(x) == '[object Function]';
-	}
-
-	function maybeWrapActionIs(condition) {
-	  return isFunction(condition) ? condition : (0, _helpers.actionIs)(condition);
-	}
-
-	var StreamWrapper = exports.StreamWrapper = (function () {
-	  function StreamWrapper(stream, parent) {
-	    _classCallCheck(this, StreamWrapper);
-
-	    this.stream = stream;
-	    this.parent = parent;
-	    this.disposable = null;
-	  }
-
-	  _createClass(StreamWrapper, [{
-	    key: 'dispatch',
-	    value: function dispatch(updateHandlers) {
-	      var _this = this,
-	          _Rx$Observable;
-
-	      var parentStream = this.stream.filter(function (_ref) {
-	        var parent = _ref.parent;
-	        return parent === _this.parent;
-	      });
-
-	      var dispatcherArray = updateHandlers.map(function (_ref2) {
-	        var _ref3 = _slicedToArray(_ref2, 2);
-
-	        var actionCondition = _ref3[0];
-	        var actionHandler = _ref3[1];
-	        return maybeWrapArray(actionCondition).reduce(function (accStream, cond) {
-	          return maybeWrapActionIs(cond).call(accStream);
-	        }, parentStream).map(function (params) {
-	          return function (state) {
-	            return actionHandler(params, state);
-	          };
-	        });
-	      });
-
-	      return (_Rx$Observable = Rx.Observable).merge.apply(_Rx$Observable, _toConsumableArray(dispatcherArray));
-	    }
-	  }, {
-	    key: 'subStream',
-	    value: function subStream(parent, subUpdate) {
-	      var _this2 = this;
-
-	      var subStreamWrapper = new StreamWrapper(this.stream, parent);
-
-	      this.disposable = subStreamWrapper.dispatch(subUpdate).do(function (stateMutator) {
-	        return _this2.send(parent, stateMutator);
-	      }).subscribe(Rx.helpers.noop, console.error.bind(console));
-
-	      return subStreamWrapper;
-	    }
-	  }, {
-	    key: 'send',
-	    value: function send(action, payload) {
-	      this.stream.onNext({ action: action, payload: payload, parent: this.parent });
-	    }
-	  }]);
-
-	  return StreamWrapper;
-	})();
-
-/***/ },
 /* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -32096,7 +32101,7 @@
 
 	var _component2 = _interopRequireDefault(_component);
 
-	var _helpers = __webpack_require__(162);
+	var _helpers = __webpack_require__(163);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -32210,7 +32215,7 @@
 	});
 	exports.default = Wrapper;
 
-	var _streamWrapper = __webpack_require__(163);
+	var _streamWrapper = __webpack_require__(162);
 
 	var _react = __webpack_require__(2);
 
