@@ -3,7 +3,7 @@ import {render} from 'react-dom';
 import Rx from 'rx';
 import {StreamWrapper, dispatch} from './streamWrapper.js';
 
-export function tanok (initialState, update, View, {container, outerEventStream}) {
+export function tanok (initialState, update, View, {container, outerEventStream, stateUpdateCallback}) {
   if (!container) {
       container = document.createElement('div');
       document.body.appendChild(container);
@@ -25,6 +25,7 @@ export function tanok (initialState, update, View, {container, outerEventStream}
     .scan((([state, _], action) => action(state)), [initialState])
     .startWith([initialState])
     .do(([state, _]) => render(<View {...state} eventStream={streamWrapper} />, container))
+    .do(([state, _]) => (stateUpdateCallback || Rx.helpers.noop)(state))
     .flatMap(([state, effect]) => effect ? effect(state, streamWrapper) : Rx.Observable.empty() )
     .subscribe(
       Rx.helpers.noop,
