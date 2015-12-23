@@ -9,7 +9,8 @@ export function tanok (initialState, update, View, {container, outerEventStream}
       document.body.appendChild(container);
   }
 
-  let eventStream = new Rx.Subject();
+  const eventStream = new Rx.Subject();
+  const stateStream = new Rx.BehaviorSubject(initialState);
   const rootParent = null;
   let dispatcher = dispatch(eventStream, update, rootParent);
 
@@ -21,10 +22,11 @@ export function tanok (initialState, update, View, {container, outerEventStream}
   }
   const streamWrapper = new StreamWrapper(eventStream, rootParent);
 
-  let disposable = dispatcher
+  const disposable = dispatcher
     .scan((([state, _], action) => action(state)), [initialState])
     .startWith([initialState])
     .do(([state, _]) => render(<View {...state} eventStream={streamWrapper} />, container))
+    .do(([state, _]) => stateStream.onNext(state))
     .flatMap(([state, effect]) => effect ? effect(state, streamWrapper) : Rx.Observable.empty() )
     .subscribe(
       Rx.helpers.noop,
@@ -33,7 +35,7 @@ export function tanok (initialState, update, View, {container, outerEventStream}
 
   streamWrapper.send('init');
 
-  return {disposable, eventStream}
+  return {disposable, eventStream, stateStream}
 }
 
 export function effectWrapper(effect, parent) {
@@ -42,4 +44,4 @@ export function effectWrapper(effect, parent) {
     : Rx.helpers.noop
 }
 
-export { tanok as default};
+export { tanok as default };
