@@ -35,7 +35,7 @@ export function tanok (initialState, update, View, {container, outerEventStream}
 
   streamWrapper.send('init');
 
-  return {disposable, eventStream}
+  return {disposable, eventStream, stateStream}
 }
 
 export function effectWrapper(effect, parent) {
