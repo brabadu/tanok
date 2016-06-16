@@ -1,28 +1,21 @@
-import {StreamWrapper} from './streamWrapper.js'
+import { StreamWrapper } from './streamWrapper.js';
 import React from 'react';
 
 export default function Wrapper(Wrapped) {
-  class TanokComponent extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+    class TanokComponent extends Wrapped {}
 
-    render() {
-        return <Wrapped {...this.props} />;
-    }
-  }
+    TanokComponent.propTypes = TanokComponent.propTypes || {};
+    TanokComponent.propTypes.eventStream = React.PropTypes.instanceOf(StreamWrapper).isRequired;
 
-  TanokComponent.propTypes = {
-    eventStream: React.PropTypes.instanceOf(StreamWrapper).isRequired
-  }
+    TanokComponent.displayName = `TanokComponent(${Wrapped.displayName || Wrapped.name})`;
 
-  Wrapped.prototype.send = function (action, payload) {
-    this.props.eventStream.send(action, payload)
-  };
+    TanokComponent.prototype.send = function send(action, payload, metadata = null) {
+        this.props.eventStream.send(action, payload, metadata);
+    };
 
-  Wrapped.prototype.subStream = function(parent, updateHandlers) {
-    return this.props.eventStream.subStream(parent, updateHandlers)
-  }
+    TanokComponent.prototype.subStream = function subStream(parent, updateHandlers) {
+        return this.props.eventStream.subStream(parent, updateHandlers);
+    };
 
-  return TanokComponent
-};
+    return TanokComponent;
+}

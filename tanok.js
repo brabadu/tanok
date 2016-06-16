@@ -1,45 +1,74 @@
-import React from 'react';
-import {render} from 'react-dom';
 import Rx from 'rx';
-import {StreamWrapper, dispatch} from './streamWrapper.js';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { StreamWrapper, dispatch } from './streamWrapper.js';
+import { on, analytic } from './decorators';
 
-export function tanok (initialState, update, View, {container, outerEventStream}) {
-  if (!container) {
-      container = document.createElement('div');
-      document.body.appendChild(container);
-  }
+const identity = (value) => value;
 
-  let eventStream = new Rx.Subject();
-  const rootParent = null;
-  let dispatcher = dispatch(eventStream, update, rootParent);
+export function tanok(initialState, update, View, { container, outerEventStream, stateSerializer = identity } = {}) {
+    if (!container) {
+        container = document.createElement('div');
+        document.body.appendChild(container);
+    }
 
-  if (outerEventStream) {
-      dispatcher = Rx.Observable.merge(
-          dispatcher,
-          dispatch(outerEventStream, update, rootParent)
-      );
-  }
-  const streamWrapper = new StreamWrapper(eventStream, rootParent);
+    const eventStream = new Rx.Subject();
+    const rootParent = null;
+    let dispatcher = dispatch(eventStream, update, rootParent);
 
-  let disposable = dispatcher
-    .scan((([state, _], action) => action(state)), [initialState])
-    .startWith([initialState])
-    .do(([state, _]) => render(<View {...state} eventStream={streamWrapper} />, container))
-    .flatMap(([state, effect]) => effect ? effect(state, streamWrapper) : Rx.Observable.empty() )
-    .subscribe(
-      Rx.helpers.noop,
-      console.error.bind(console)
-    );
+    if (outerEventStream) {
+        dispatcher = Rx.Observable.merge(
+            dispatcher,
+            dispatch(outerEventStream, update, rootParent)
+        );
+    }
+    const streamWrapper = new StreamWrapper(eventStream, rootParent);
 
-  streamWrapper.send('init');
+    const disposable = dispatcher
+        .scan((([state, _], action) => action(state)), [initialState])
+        .startWith([initialState])
+        .do(([state]) => ReactDOM.render(<View {...stateSerializer(state)} eventStream={streamWrapper} />, container))
+        .flatMap(([_, ...effects]) => Rx.Observable.merge(effects.map((e) => e(streamWrapper))))
+        .subscribe(
+            Rx.helpers.noop,
+            console.error.bind(console)
+        );
 
-  return {disposable, eventStream}
+    streamWrapper.send('init');
+
+    return { disposable, eventStream };
 }
 
 export function effectWrapper(effect, parent) {
-  return (state, {stream}) => effect
-    ? effect(state, new StreamWrapper(stream, parent))
-    : Rx.helpers.noop
+    return ({ stream }) => {
+        return effect
+            ? effect(new StreamWrapper(stream, parent))
+            : Rx.helpers.noop;
+    };
 }
 
-export { tanok as default};
+/**
+* Usage example:
+* class HelloWorldDispatcher extends TanokDispatcher {
+*
+*   @on('helloEvent')
+*   helloWorld (eventPayload, state) {
+*       state.word = eventPayload.word;
+*       return [state, helloWorldEffect];
+*   }
+* }
+*
+* var helloWorldDispatcher = new HelloWorldDispatcher();
+* tanok(HelloWorldModel, helloWorldDispatcher.collect(), ViewComponent, {container})
+* */
+export class TanokDispatcher {
+    collect() {
+        return this.events.map(([predicate, stateMutator]) => [predicate, stateMutator.bind(this)]);
+    }
+}
+
+export {
+    tanok as default,
+    on,
+    analytic,
+};
