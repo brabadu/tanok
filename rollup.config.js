@@ -6,7 +6,7 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 const peerDependencies = Object.keys(require('./package.json').peerDependencies)
 
 export default {
-  entry: 'tanok.js',
+  entry: 'src/tanok.js',
   dest: 'dist/tanok.js',
   format: 'umd',
   moduleName: 'tanok',
