@@ -3,13 +3,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
 import { on } from './decorators';
-import objectAssign from 'object-assign';
-
-Object.assign = Object.assign || objectAssign;
 
 const identity = (value) => value;
 
-export function tanok(initialState, update, view, { container, outerEventStream, stateSerializer = identity } = {}) {
+export function tanok(initialState, update, view, options) {
+    let { container, outerEventStream, stateSerializer = identity } = options || {};
     if (!container) {
         container = document.createElement('div');
         document.body.appendChild(container);
@@ -33,7 +31,7 @@ export function tanok(initialState, update, view, { container, outerEventStream,
         .do(([state]) => ReactDOM.render(
             React.createElement(
                 view,
-                Object.assign({}, stateSerializer(state), {eventStream: streamWrapper})
+                {...stateSerializer(state), eventStream: streamWrapper}
             ),
             container
         ))

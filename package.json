@@ -2,8 +2,12 @@
   "name": "tanok",
   "version": "0.3.2",
   "description": "Lightweight pattern for React+Rx.js front-end applications. Written under heavy impression of Elm Architecture",
-  "main": "tanok.js",
+  "main": "dist/tanok.js",
   "scripts": {
+    "prepublish": "npm run test",
+    "pretest": "npm run build",
+    "build": "rollup -c",
+    "prebuild": "rm -rf dist/*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -16,6 +20,9 @@
   "author": {
     "name": "Boryslav Larin"
   },
+  "contributors": [
+    "Anton Verinov <anton@verinov.com>"
+  ],
   "license": "MIT",
   "peerDependencies": {
     "react": "^0.14.0",
@@ -24,13 +31,14 @@
   },
   "devDependencies": {
     "babel-core": "^6.1.21",
-    "babel-loader": "^6.1.0",
-    "babel-plugin-transform-runtime": "^6.1.18",
-    "babel-polyfill": "^6.1.19",
-    "babel-preset-es2015": "^6.1.18",
-    "babel-runtime": "^6.1.18"
-  },
-  "dependencies": {
-    "object-assign": "^4.1.0"
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015-rollup": "^1.1.1",
+    "react": "^0.14.0",
+    "react-dom": "^0.14.0",
+    "rollup": "^0.31.2",
+    "rollup-plugin-babel": "^2.5.1",
+    "rollup-plugin-commonjs": "^3.0.0",
+    "rollup-plugin-node-resolve": "^1.7.0",
+    "rx": "^4.0.6"
   }
 }
