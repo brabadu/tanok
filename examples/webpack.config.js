@@ -3,7 +3,6 @@ path = require('path')
 module.exports = {
     entry: {
       main: "./main/main.js",
-      simple: ['babel-polyfill', "./simple/simple.js"],
       two_counters: "./two_counters/two_counters.js",
     },
     output: {
