@@ -2,11 +2,14 @@ import Rx from 'rx';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
-import { on, analytic } from './decorators';
+import { on } from './decorators';
+import objectAssign from 'object-assign';
+
+Object.assign = Object.assign || objectAssign;
 
 const identity = (value) => value;
 
-export function tanok(initialState, update, View, { container, outerEventStream, stateSerializer = identity } = {}) {
+export function tanok(initialState, update, view, { container, outerEventStream, stateSerializer = identity } = {}) {
     if (!container) {
         container = document.createElement('div');
         document.body.appendChild(container);
@@ -27,7 +30,13 @@ export function tanok(initialState, update, View, { container, outerEventStream,
     const disposable = dispatcher
         .scan((([state, _], action) => action(state)), [initialState])
         .startWith([initialState])
-        .do(([state]) => ReactDOM.render(<View {...stateSerializer(state)} eventStream={streamWrapper} />, container))
+        .do(([state]) => ReactDOM.render(
+            React.createElement(
+                view,
+                Object.assign({}, stateSerializer(state), {eventStream: streamWrapper})
+            ),
+            container
+        ))
         .flatMap(([_, ...effects]) => Rx.Observable.merge(effects.map((e) => e(streamWrapper))))
         .subscribe(
             Rx.helpers.noop,
@@ -70,5 +79,4 @@ export class TanokDispatcher {
 export {
     tanok as default,
     on,
-    analytic,
 };
