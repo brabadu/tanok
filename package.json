@@ -1,12 +1,12 @@
 {
   "name": "tanok",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Lightweight pattern for React+Rx.js front-end applications. Written under heavy impression of Elm Architecture",
   "main": "dist/tanok.js",
   "scripts": {
     "prepublish": "npm run test",
     "pretest": "npm run build",
-    "build": "rollup -c",
+    "build": "node rollup.js",
     "prebuild": "rm -rf dist/*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
