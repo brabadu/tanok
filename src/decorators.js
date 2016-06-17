@@ -7,8 +7,8 @@
  *
  *   @on('helloEvent')
  *   helloWorld (eventPayload, state) {
- *       state.word = eventPayload.word;
- *       return [state, helloWorldEffect];
+ *     state.word = eventPayload.word;
+ *     return [state, helloWorldEffect];
  *   }
  * }
  *
@@ -16,8 +16,8 @@
  * @returns {Function}
  */
 export function on(...predicate) {
-    return (target, property) => {
-        target.events = target.events || [];
-        target.events.push([predicate, target[property]]);
-    };
+  return (target, property) => {
+    target.events = target.events || [];
+    target.events.push([predicate, target[property]]);
+  };
 }
