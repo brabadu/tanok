@@ -8,7 +8,7 @@
     "pretest": "npm run build",
     "build": "node rollup.js",
     "prebuild": "rm -rf dist/*",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [
     "rxjs",
@@ -33,6 +33,7 @@
     "babel-core": "^6.1.21",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015-rollup": "^1.1.1",
+    "mocha": "^2.5.3",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
     "rollup": "^0.31.2",
