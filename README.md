@@ -1,15 +1,21 @@
-# tanok
-Glue between React & rx.js, inspired by Elm Architecture.
+# tanok 💃
+State management for React using Rx.js and Elm Architecture inspiration.
 
-/You could start with [Elm Architecture Tutorial](https://github.com/evancz/elm-architecture-tutorial/), there's more info/
+You could start with [Elm Architecture Tutorial](https://github.com/evancz/elm-architecture-tutorial/), there's more info
 
 Elm Architecture gives you a way to build complex UI with everything we'd like
-to have these days. Unidirectional data flow, separation of concerns, fast HTML
-rendering.
+to have these days. Unidirectional data flow, separation of concerns,
+usable child components and fast HTML rendering.
 
 **tanok** let's you do the same with JavaScript, React and Rx.js.
 
-> **tanok** is also slavic circle dance BTW.
+> **tanok** is also slavic circle dance
+
+# Installation
+
+`npm install tanok`
+
+# Usage
 
 To start with something small and simple we'll make a counter (see file `/examples/simple/simple.js`). First we need a place to store our data.
 
