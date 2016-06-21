@@ -74,3 +74,15 @@ tanok(model, update, Counter, div);
 This is simple version of tanok. Inside `tanok` function rx.js stream is created, all events go through it and dispatched according to `update` provided. Than dispatcher returns appropriate function and it is applied to current application state to produce new state. New application state is used to render new interface. This way you can add handlers only to synchronous events like mouse clicks or keyboard typing. It is very limited, and is made mainly for educational purposes.
 
 Any serious real-world app needs async calls to server, setTimeout etc. To make it possible we need a thing we call *Effect*
+
+
+# Authors
+
+Great people of Evo Company:
+
+* [Boryslav Larin](http://github.com/brabadu)
+* [Dmitry Sadkovoy](http://github.com/sadkovoy)
+* [Valeriy Morkovin](http://github.com/Lex0ne)
+* [Anton Verinov](http://github.com/zemlanin)
+
+With thoughful tests and wise advices from many others.
