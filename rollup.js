@@ -19,6 +19,10 @@ const entries = [
     entry: 'src/helpers.js',
     moduleName: 'tanokHelpers',
   },
+  {
+    entry: 'src/streamWrapper.js',
+    moduleName: 'tanokStreamWrapper',
+  },
 ]
 const external = entries.map((p) => path.resolve(p.entry))
 const plugins = [
@@ -43,6 +47,6 @@ entries.forEach((entry) => {
   .then((bundle) => bundle.write({
     format: 'umd',
     moduleName: entry.moduleName,
-    dest: entry.entry.replace('src', 'dist'),
+    dest: entry.entry.replace('src', 'lib'),
   }))
 })

@@ -3,7 +3,7 @@
 const assert = require("assert")
 
 const Rx = require("rx")
-const tanokHelpers = require("../dist/helpers.js")
+const tanokHelpers = require("../lib/helpers.js")
 
 describe('tanokHelpers', function () {
   describe('actionIs', function () {
