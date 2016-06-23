@@ -19,7 +19,7 @@ usable child components and fast HTML rendering.
 
 To start with something small and simple we'll make a counter (see file `/examples/simple/simple.js`). First we need a place to store our data.
 
-```model.js```
+`model.js`
 ```
 export default model = {
   count: 0,
@@ -28,7 +28,7 @@ export default model = {
 
 Next we need rules to update our model
 
-```view.js```
+`view.js`
 ```
 
 import {TanokDispatcher} from 'tanok';
@@ -48,11 +48,13 @@ class CounterDispatcher extends TanokDispatcher {
         return [state];
     }
 }
+
+export default CounterDispatcher;
 ```
 
 Last crucial thing for UI is it's visual representation
 
-```dispatcher.js```
+`dispatcher.js`
 ```
 import TanokComponent from 'tanok/lib/component';
 
