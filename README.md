@@ -82,7 +82,7 @@ Great people of Evo Company:
 
 * [Boryslav Larin](http://github.com/brabadu)
 * [Dmitry Sadkovoy](http://github.com/sadkovoy)
-* [Valeriy Morkovin](http://github.com/Lex0ne)
+* [Valeriy Morkovyn](http://github.com/Lex0ne)
 * [Anton Verinov](http://github.com/zemlanin)
 
 With thoughful tests and wise advices from many others.
