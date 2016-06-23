@@ -28,7 +28,7 @@ export default model = {
 
 Next we need rules to update our model
 
-`view.js`
+`dispatcher.js`
 ```
 
 import {TanokDispatcher} from 'tanok';
@@ -54,7 +54,7 @@ export default CounterDispatcher;
 
 Last crucial thing for UI is it's visual representation
 
-`dispatcher.js`
+`view.js`
 ```
 import TanokComponent from 'tanok/lib/component';
 
