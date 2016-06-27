@@ -20,6 +20,10 @@ const entries = [
     moduleName: 'tanokHelpers',
   },
   {
+    entry: 'src/decorators.js',
+    moduleName: 'tanokDecorators',
+  },
+  {
     entry: 'src/streamWrapper.js',
     moduleName: 'tanokStreamWrapper',
   },
@@ -31,8 +35,8 @@ const entries = [
 const external = entries.map((p) => path.resolve(p.entry))
 const plugins = [
   babel({
-    "presets": [ "es2015-rollup" ],
-    "plugins": [ "transform-object-rest-spread" ],
+    "presets": [ "stage-0", "es2015-rollup", "react" ],
+    "plugins": [ "transform-decorators-legacy", "transform-object-rest-spread" ],
   }),
   nodeResolve({
     main: true,

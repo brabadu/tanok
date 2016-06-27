@@ -1,28 +1,27 @@
-'use strict'
+'use strict';
 
-const assert = require("assert")
+import Rx from 'rx';
 
-const Rx = require("rx")
-const tanokHelpers = require("../lib/helpers.js")
+import { actionIs } from '../src/helpers';
 
-describe('tanokHelpers', function () {
-  describe('actionIs', function () {
-    it('passes correct action', function (done) {
-      const stream = Rx.Observable.of({action: 't'})
+describe('tanokHelpers', () => {
+  describe('actionIs', () => {
+    it('passes correct action', (done) => {
+      const stream = Rx.Observable.of({ action: 't' });
 
-      tanokHelpers.actionIs('t').call(stream)
-        .subscribe(function () { done() })
-    })
+      actionIs('t').call(stream)
+        .subscribe(() => { done() })
+    });
 
-    it('filters incorrect action', function (done) {
-      const stream = Rx.Observable.of({action: 'f'})
+    it('filters incorrect action', (done) => {
+      const stream = Rx.Observable.of({ action: 'f' });
 
-      tanokHelpers.actionIs('t').call(stream)
+      actionIs('t').call(stream)
         .subscribe(
-          function () { throw new Error },
-          function (e) { throw e },
-          function () { done() }
+          () => { throw new Error },
+          (e) => { throw e },
+          () => { done() }
         )
     })
   })
-})
+});
