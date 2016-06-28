@@ -2,8 +2,7 @@ path = require('path')
 
 module.exports = {
     entry: {
-      main: "./main/main.js",
-      two_counters: "./two_counters/two_counters.js",
+      main: "./main.js",
     },
     output: {
         path: __dirname,

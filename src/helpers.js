@@ -27,3 +27,9 @@ export function throttle(time) {
     return this.throttle(time);
   };
 }
+
+export function rethrowFx(action, payload) {
+  return function (stream) {
+    stream.send(action, payload)
+  }
+}
