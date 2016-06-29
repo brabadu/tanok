@@ -8,7 +8,7 @@
     "pretest": "npm run build",
     "build": "node rollup.js",
     "prebuild": "rm -rf lib/*",
-    "test": "mocha"
+    "test": "mocha --compilers js:babel-core/register"
   },
   "repository": {
     "type": "git",
@@ -37,8 +37,11 @@
   },
   "devDependencies": {
     "babel-core": "^6.1.21",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015-rollup": "^1.1.1",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.5.0",
     "mocha": "^2.5.3",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",

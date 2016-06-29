@@ -56,8 +56,9 @@ Last crucial thing for UI is it's visual representation
 
 `view.js`
 ```
-import TanokComponent from 'tanok/lib/component';
+import tanokComponent from 'tanok/lib/component';
 
+@tanokComponent
 class Counter extends React.Component {
     constructor(props) {
         super(props);
@@ -86,7 +87,7 @@ class Counter extends React.Component {
     }
 }
 
-export default TanokComponent(Counter);
+export default Counter;
 ```
 
 Now on to dancing

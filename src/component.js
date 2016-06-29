@@ -1,21 +1,32 @@
-import { StreamWrapper } from './streamWrapper.js';
 import React from 'react';
 
-export default function Wrapper(Wrapped) {
-  class TanokComponent extends Wrapped {}
+import { StreamWrapper } from './streamWrapper.js';
 
-  TanokComponent.propTypes = TanokComponent.propTypes || {};
-  TanokComponent.propTypes.eventStream = React.PropTypes.instanceOf(StreamWrapper).isRequired;
+/**
+ * Decorator used with class-based React components.
+ * It provides all the required props and helpers for tanok internals.
+ *
+ * Usage example:
+ *
+ * @tanokComponent
+ * class MyComponent extends React.Component {
+ *    ... your component methods.
+ * }
+ *
+ * */
+export default function tanokComponent(target) {
+  target.propTypes = target.propTypes || {};
+  target.propTypes.eventStream = React.PropTypes.instanceOf(StreamWrapper).isRequired;
 
-  TanokComponent.displayName = `TanokComponent(${Wrapped.displayName || Wrapped.name})`;
+  target.displayName = `TanokComponent(${target.displayName || target.name})`;
 
-  TanokComponent.prototype.send = function send(action, payload, metadata = null) {
+  target.prototype.send = function send(action, payload, metadata = null) {
     this.props.eventStream.send(action, payload, metadata);
   };
 
-  TanokComponent.prototype.subStream = function subStream(parent, updateHandlers) {
+  target.prototype.subStream = function subStream(parent, updateHandlers) {
     return this.props.eventStream.subStream(parent, updateHandlers);
   };
 
-  return TanokComponent;
+  return target;
 }
