@@ -52,9 +52,14 @@ entries.forEach((entry) => {
     external: external,
     plugins: plugins,
   })
-  .then((bundle) => bundle.write({
-    format: 'umd',
-    moduleName: entry.moduleName,
-    dest: entry.entry.replace('src', 'lib'),
-  }))
-})
+  .then(
+      (bundle) => bundle.write({
+        format: 'umd',
+        moduleName: entry.moduleName,
+        dest: entry.entry.replace('src', 'lib'),
+      }),
+      (error) => {
+        console.error(error)
+      }
+  )
+});

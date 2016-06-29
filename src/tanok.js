@@ -6,6 +6,27 @@ import { on } from './decorators';
 
 const identity = (value) => value;
 
+/**
+ * @typedef TanokReturnValue
+ * @type { Object }
+ * @property { Object } disposable - Returns disposable that can be used for observers disposing.
+ * @property { Object } eventStream - Your app inner eventStream.
+ * */
+
+/**
+ * App-initialization function.
+ * @param { Object } initialState - Initial state of your application.
+ * @param { Array } update - Array of pairs "predicate - state mutator",
+ * declarative statement of your events dispatching. Usually - result of dispatcher.collect() invocation.
+ * @param { class } view - Your root component class.
+ * @param { Object } options - Advanced app configuration
+ * @param { HTMLElement } options.container - Root node of your application.
+ * If not provided - new "div" will be added and appended to document.body .
+ * @param { Object } options.outerEventStream - Yet another stream that will be merged to your app inner stream.
+ * @param { Function } options.stateSerializer - Advanced function to serialize your model before passing to view as props.
+ * @returns { TanokReturnValue } - Returns disposable as result of your observers applying,
+ * and your app inner eventStream.
+ * */
 export function tanok(initialState, update, view, options) {
   let { container, outerEventStream, stateSerializer = identity } = options || {};
   if (!container) {
