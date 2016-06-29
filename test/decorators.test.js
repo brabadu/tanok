@@ -3,7 +3,7 @@
 import React from 'react';
 import assert from 'assert';
 
-import { tanokComponent } from '../src/decorators.js';
+import tanokComponent from '../src/component.js';
 
 describe('tanokDecorators', () => {
   describe('tanokComponent', () => {
@@ -23,5 +23,5 @@ describe('tanokDecorators', () => {
       done();
     })
     
-  })
+  });
 });

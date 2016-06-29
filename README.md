@@ -56,7 +56,7 @@ Last crucial thing for UI is it's visual representation
 
 `view.js`
 ```
-import tanokComponent from 'tanok/lib/decorators';
+import tanokComponent from 'tanok/lib/component';
 
 @tanokComponent
 class Counter extends React.Component {
