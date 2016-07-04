@@ -1,20 +1,33 @@
 import React from 'react'
-import {on, TanokDispatcher} from '../../lib/tanok.js';
 import tanokComponent from '../../lib/component.js';
+import {on, TanokDispatcher} from '../../lib/tanok.js';
 
 /*
   Model
 */
-export function init() {
+export function init(id) {
   return {
+    id: id,
     count: 0,
+    synced: false,
   }
 };
 
 /*
+  Effects
+*/
+function syncEffect(cnt) {
+  return function (stream) {
+    fetch('http://www.mocky.io/v2/5772de42120000a42115f714')
+      .then((r) => r.json())
+      .then((json) => stream.send('syncSuccess', json, cnt.id))
+  }
+}
+
+
+/*
   Update
 */
-
 export class CounterDispatcher extends TanokDispatcher {
   @on('init')
   init(payload, state) {
@@ -25,15 +38,24 @@ export class CounterDispatcher extends TanokDispatcher {
   @on('inc')
   inc(payload, state) {
     state.count += 1;
-    return [state];
+    state.synced = false;
+
+    return [state, syncEffect(state.count)];
   }
 
   @on('dec')
   dec(payload, state) {
     state.count -= 1;
-    return [state];
+    state.synced = false;
+
+    return [state, syncEffect(state.count)];
   }
 
+  @on('syncSuccess')
+  syncSuccess(payload, state) {
+    state.synced = true;
+    return [state];
+  }
 }
 
 /*
@@ -56,7 +78,7 @@ export class Counter extends React.Component {
     return (
       <div>
         <button onClick={this.onMinusClick}>-</button>
-        <span>{this.props.count}</span>
+        <span style={{color: this.props.synced ? 'green' : 'red'}}>{this.props.count}</span>
         <button onClick={this.onPlusClick}>+</button>
       </div>
     )

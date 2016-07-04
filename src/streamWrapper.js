@@ -49,6 +49,8 @@ export class StreamWrapper {
         console.error.bind(console)
       );
 
+    subStreamWrapper.send('init');
+
     return subStreamWrapper;
   }
 

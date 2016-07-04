@@ -1,4 +1,5 @@
 path = require('path')
+var PROJECT_DEPS = process.env.PROJECT_DEPS || __dirname;
 
 module.exports = {
     entry: {
@@ -6,16 +7,23 @@ module.exports = {
     },
     output: {
         path: __dirname,
-        filename: "./[name]/[name].bundle.js"
+        pathinfo: true,
+        filename: "./[name].bundle.js"
+    },
+    resolve: {
+        root: path.resolve(PROJECT_DEPS, '../node_modules'),
     },
     module: {
         loaders: [
           {
             test: /\.jsx?$/,
             loader: 'babel-loader',
-            exclude: /node_modules/,
+            exclude: /node_modules|lib/,
             query: {
-                presets: ['es2015', 'react']
+                presets: ['es2015',  "stage-0", 'react'],
+                plugins: [ //"external-helpers-2",
+                "transform-runtime",
+                "transform-decorators-legacy", "transform-object-rest-spread" ]
             }
           }
         ]

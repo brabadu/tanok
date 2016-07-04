@@ -1,6 +1,7 @@
 import React from 'react'
 import tanokComponent from '../../lib/component.js';
-import {debounce} from '../../lib/helpers.js';
+import {on, TanokDispatcher} from '../../lib/tanok.js';
+
 
 /*
   Model
@@ -17,7 +18,7 @@ export function init() {
 */
 function syncEffect(cnt) {
   return function (stream) {
-    fetch('http://www.mocky.io/v2/5772de42120000a42115f714')
+    fetch('http://www.mocky.io/v2/577824a4120000ca28aac904')
       .then((r) => r.json())
       .then((json) => stream.send('syncSuccess', json))
   }
@@ -28,12 +29,12 @@ function syncEffect(cnt) {
   Update
 */
 
-export class Counter extends TanokDispatcher {
+export class CounterDispatcher extends TanokDispatcher {
   @on('init')
   init(payload, state) {
     state.count = 10;
     return [state];
-  },
+  }
 
   @on('inc')
   inc(payload, state) {
@@ -41,7 +42,7 @@ export class Counter extends TanokDispatcher {
     state.synced = false;
 
     return [state, syncEffect(state.count)];
-  },
+  }
 
   @on('dec')
   dec(payload, state) {
@@ -49,7 +50,7 @@ export class Counter extends TanokDispatcher {
     state.synced = false;
 
     return [state, syncEffect(state.count)];
-  },
+  }
 
   @on('syncSuccess')
   syncSuccess(payload, state) {
@@ -61,8 +62,10 @@ export class Counter extends TanokDispatcher {
 /*
   View
 */
-class CounterView extends React.Component {
+@tanokComponent
+export class Counter extends React.Component {
   constructor(props) {
+    super(props);
     this.onPlusClick = this.onPlusClick.bind(this);
     this.onMinusClick = this.onMinusClick.bind(this);
   }
@@ -75,12 +78,10 @@ class CounterView extends React.Component {
   render() {
     return (
       <div>
-        <button onClick={this.onPlusClick}>+</button>
-        <span style={{color: this.props.synced ? 'green' : 'red'}}>{this.props.count}</span>
         <button onClick={this.onMinusClick}>-</button>
+        <span style={{color: this.props.synced ? 'green' : 'red'}}>{this.props.count}</span>
+        <button onClick={this.onPlusClick}>+</button>
       </div>
     )
-    }
+  }
 }
-
-export const Counter = tanokComponent(Counter)

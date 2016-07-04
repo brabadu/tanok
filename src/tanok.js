@@ -56,7 +56,14 @@ export function tanok(initialState, update, view, options) {
       ),
       container
     ))
-    .flatMap(([_, ...effects]) => Rx.Observable.merge(effects.map((e) => e(streamWrapper))))
+    .do(([_, ...effects]) =>
+      effects.forEach((e) =>
+        Rx.Observable.spawn(e(streamWrapper)).subscribe(
+          Rx.helpers.noop,
+          console.error.bind(console)
+        )
+      )
+    )
     .subscribe(
       Rx.helpers.noop,
       console.error.bind(console)
@@ -96,6 +103,5 @@ export class TanokDispatcher {
 }
 
 export {
-  tanok as default,
   on,
 };

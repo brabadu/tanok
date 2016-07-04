@@ -26,7 +26,7 @@
   },
   "contributors": [
     "Dmitry Sadkovoy",
-    "Valeriy Morkovin",
+    "Valeriy Morkovyn",
     "Anton Verinov <anton@verinov.com>"
   ],
   "license": "MIT",
@@ -37,8 +37,10 @@
   },
   "devDependencies": {
     "babel-core": "^6.1.21",
+    "babel-loader": "^6.2.4",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-plugin-transform-runtime": "^6.9.0",
     "babel-preset-es2015-rollup": "^1.1.1",
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-0": "^6.5.0",
@@ -50,5 +52,8 @@
     "rollup-plugin-commonjs": "^3.0.0",
     "rollup-plugin-node-resolve": "^1.7.0",
     "rx": "^4.0.6"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.9.2"
   }
 }
