@@ -8,7 +8,7 @@
     "pretest": "npm run build",
     "build": "node rollup.js",
     "prebuild": "rm -rf lib/*",
-    "test": "mocha --compilers js:babel-core/register"
+    "test": "mocha --compilers js:babel-register"
   },
   "repository": {
     "type": "git",

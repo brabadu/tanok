@@ -24,11 +24,12 @@ const identity = (value) => value;
  * If not provided - new "div" will be added and appended to document.body .
  * @param { Object } options.outerEventStream - Yet another stream that will be merged to your app inner stream.
  * @param { Function } options.stateSerializer - Advanced function to serialize your model before passing to view as props.
+ * @param { Array } options.middlewares - List of middlewares.
  * @returns { TanokReturnValue } - Returns disposable as result of your observers applying,
  * and your app inner eventStream.
  * */
 export function tanok(initialState, update, view, options) {
-  let { container, outerEventStream, stateSerializer = identity } = options || {};
+  let { container, outerEventStream, stateSerializer = identity, middlewares=[] } = options || {};
   if (!container) {
     container = document.createElement('div');
     document.body.appendChild(container);
@@ -46,17 +47,26 @@ export function tanok(initialState, update, view, options) {
   }
   const streamWrapper = new StreamWrapper(eventStream, rootParent);
 
-  const disposable = dispatcher
-    .scan((([state, _], action) => action(state)), [initialState])
-    .startWith([initialState])
-    .do(([state]) => ReactDOM.render(
+  let disposable = dispatcher
+    .scan((({state}, action) => {
+      const {state : newState, effects=[], params} = action(state);
+      return {state: newState, effects, params: params}
+    }), {state: initialState})
+    .startWith({state: initialState});
+
+  middlewares.forEach((middleWare) => {
+    disposable = disposable.map(middleWare)
+  });
+
+  disposable
+    .do(({state}) => ReactDOM.render(
       React.createElement(
         view,
         {...stateSerializer(state), eventStream: streamWrapper}
       ),
       container
     ))
-    .do(([_, ...effects]) =>
+    .do(({effects=[]}) =>
       effects.forEach((e) =>
         Rx.Observable.spawn(e(streamWrapper)).subscribe(
           Rx.helpers.noop,
