@@ -31,12 +31,17 @@ const entries = [
     entry: 'src/component.js',
     moduleName: 'tanokComponent',
   },
+  {
+    entry: 'src/middlewares.js',
+    moduleName: 'tanokMiddlewares',
+  },
 ]
 const external = entries.map((p) => path.resolve(p.entry))
 const plugins = [
   babel({
-    "presets": [ "stage-0", "es2015-rollup", "react" ],
+    "presets": [ "es2015-rollup", "stage-0", "react" ],
     "plugins": [ "transform-decorators-legacy", "transform-object-rest-spread" ],
+    "babelrc": false
   }),
   nodeResolve({
     main: true,

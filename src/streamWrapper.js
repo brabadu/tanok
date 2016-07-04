@@ -28,7 +28,10 @@ export class StreamWrapper {
         maybeWrapArray(actionCondition)
           .reduce((accStream, cond) => maybeWrapActionIs(cond).call(accStream), parentStream)
           .map((params) => {
-            return [(state) => actionHandler(params.payload, state, params), params];
+            return [(state) => {
+                const [newState, ...effects] = actionHandler(params.payload, state, params);
+                return {state: newState, effects, params};
+            }, params];
           }));
       return Rx.Observable.merge(...dispatcherArray);
     }
@@ -65,7 +68,10 @@ export function dispatch(stream, updateHandlers, filterParent) {
   const dispatcherArray = updateHandlers.map(([actionCondition, actionHandler]) =>
     maybeWrapArray(actionCondition)
       .reduce((accStream, cond) => maybeWrapActionIs(cond).call(accStream), parentStream)
-      .map((params) => (state) => actionHandler(params.payload, state, params)));
+      .map((params) => (state) => {
+          const [newState, ...effects] = actionHandler(params.payload, state, params);
+          return {state: newState, effects, params};
+      }));
 
   return Rx.Observable.merge(...dispatcherArray);
 }
