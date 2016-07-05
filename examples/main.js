@@ -1,5 +1,4 @@
 import {tanok} from '../lib/tanok.js';
-import {loggingMiddleware} from '../lib/middlewares.js';
 
 import {
   init as init_1,

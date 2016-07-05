@@ -18,7 +18,10 @@ export function init() {
 */
 function syncEffect(cnt) {
   return function (stream) {
-    fetch('http://www.mocky.io/v2/577824a4120000ca28aac904')
+    fetch('http://www.mocky.io/v2/577824a4120000ca28aac904', {
+      method: 'POST',
+      body: cnt,
+    })
       .then((r) => r.json())
       .then((json) => stream.send('syncSuccess', json))
   }

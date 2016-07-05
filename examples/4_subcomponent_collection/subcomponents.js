@@ -14,10 +14,10 @@ export function init() {
 
 export class Dashboard extends TanokDispatcher {
   @on('countersChange')
-  countersChange(payload, state, {metakey}) {
-    const [newState, ...effects] = payload(state.counters[metakey]);
-    state.counters[metakey] = newState;
-    return [state, ...effects.map((e) => effectWrapper(e, 'counters'))]
+  countersChange(payload, state, {metadata}) {
+    const [newState, ...effects] = payload(state.counters[metadata]);
+    state.counters[metadata] = newState;
+    return [state, ...effects.map((e) => effectWrapper(e, 'countersChange'))]
   }
 }
 
@@ -25,20 +25,19 @@ export class Dashboard extends TanokDispatcher {
 export class CountersCollection extends React.Component {
   componentWillMount() {
     this.setState({
-      topEs: this.subStream('top', (new CounterDispatcher).collect()),
-      bottomEs: this.subStream('bottom', (new CounterDispatcher).collect())
-    })
+      countersChange: this.subStream('countersChange', (new CounterDispatcher).collect()),
+    });
   }
 
   componentWillUnmount() {
-    this.state.topEs.disposable();
-    this.state.bottomEs.disposable();
+    this.state.countersChange.disposable();
   }
 
   render() {
       return <div>
-        <Counter {...this.props.top} eventStream={this.state.topEs} />
-        <Counter {...this.props.bottom} eventStream={this.state.bottomEs} />
+        {this.props.counters.map((counter) =>
+          <Counter key={counter.id} {...counter} eventStream={this.state.countersChange} />
+        )}
       </div>
   }
 }

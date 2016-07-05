@@ -16,11 +16,14 @@ export function init(id) {
 /*
   Effects
 */
-function syncEffect(cnt) {
+function syncEffect(id, cnt) {
   return function (stream) {
-    fetch('http://www.mocky.io/v2/5772de42120000a42115f714')
+    fetch('http://www.mocky.io/v2/577824a4120000ca28aac904', {
+      method: 'POST',
+      body: cnt,
+    })
       .then((r) => r.json())
-      .then((json) => stream.send('syncSuccess', json, cnt.id))
+      .then((json) => stream.send('syncSuccess', json, id))
   }
 }
 
@@ -29,18 +32,12 @@ function syncEffect(cnt) {
   Update
 */
 export class CounterDispatcher extends TanokDispatcher {
-  @on('init')
-  init(payload, state) {
-    state.count = 10;
-    return [state];
-  }
-
   @on('inc')
   inc(payload, state) {
     state.count += 1;
     state.synced = false;
 
-    return [state, syncEffect(state.count)];
+    return [state, syncEffect(state.id, state.count)];
   }
 
   @on('dec')
@@ -48,7 +45,7 @@ export class CounterDispatcher extends TanokDispatcher {
     state.count -= 1;
     state.synced = false;
 
-    return [state, syncEffect(state.count)];
+    return [state, syncEffect(state.id, state.count)];
   }
 
   @on('syncSuccess')
@@ -69,10 +66,10 @@ export class Counter extends React.Component {
     this.onMinusClick = this.onMinusClick.bind(this);
   }
   onPlusClick() {
-    this.send('inc')
+    this.send('inc', null, this.props.id)
   }
   onMinusClick() {
-    this.send('dec')
+    this.send('dec', null, this.props.id)
   }
   render() {
     return (
