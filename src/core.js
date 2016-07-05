@@ -2,7 +2,6 @@ import Rx from 'rx';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
-import { on } from './decorators';
 
 const identity = (value) => value;
 
@@ -47,7 +46,7 @@ export function tanok(initialState, update, view, options) {
   }
   const streamWrapper = new StreamWrapper(eventStream, rootParent);
 
-  let disposable = dispatcher
+  dispatcher = dispatcher
     .scan((({state}, action) => {
       const {state : newState, effects=[], params} = action(state);
       return {state: newState, effects, params: params}
@@ -55,10 +54,10 @@ export function tanok(initialState, update, view, options) {
     .startWith({state: initialState});
 
   middlewares.forEach((middleWare) => {
-    disposable = disposable.map(middleWare)
+    dispatcher = dispatcher.map(middleWare)
   });
 
-  disposable
+  streamWrapper.disposable = dispatcher
     .do(({state}) => ReactDOM.render(
       React.createElement(
         view,
@@ -81,7 +80,10 @@ export function tanok(initialState, update, view, options) {
 
   streamWrapper.send('init');
 
-  return { disposable, eventStream };
+  return {
+    disposable: streamWrapper.disposable,
+    eventStream,
+  };
 }
 
 export function effectWrapper(effect, parent) {
@@ -111,7 +113,3 @@ export class TanokDispatcher {
     return this.events.map(([predicate, stateMutator]) => [predicate, stateMutator.bind(this)]);
   }
 }
-
-export {
-  on,
-};
