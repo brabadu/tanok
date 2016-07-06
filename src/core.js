@@ -88,8 +88,11 @@ export function tanok(initialState, update, view, options) {
     .do(({state}) => component.setState(state))
     .do(({effects=[]}) =>
       effects.forEach((e) =>
-        Rx.Observable.spawn(e(streamWrapper)).subscribe(
-          Rx.helpers.noop,
+        Rx.Observable.spawn(e(streamWrapper))
+        .filter(Rx.Observable.isObservable)
+        .map((obs) => obs.subscribe())
+        .subscribe(
+          () => {debugger},
           console.error.bind(console)
         )
       )
