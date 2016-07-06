@@ -5,6 +5,21 @@ import { StreamWrapper, dispatch } from './streamWrapper.js';
 
 const identity = (value) => value;
 
+class Root extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = props;
+  }
+
+  render() {
+    return React.createElement(
+      this.props.view,
+      this.state
+    )
+  }
+}
+
+
 /**
  * @typedef TanokReturnValue
  * @type { Object }
@@ -46,6 +61,18 @@ export function tanok(initialState, update, view, options) {
   }
   const streamWrapper = new StreamWrapper(eventStream, rootParent);
 
+  const component = ReactDOM.render(
+    React.createElement(
+      Root,
+      {
+        view,
+        eventStream: streamWrapper,
+        ...stateSerializer(initialState),
+      }
+    ),
+    container
+  );
+
   dispatcher = dispatcher
     .scan((({state}, action) => {
       const {state : newState, effects=[], params} = action(state);
@@ -58,13 +85,7 @@ export function tanok(initialState, update, view, options) {
   });
 
   streamWrapper.disposable = dispatcher
-    .do(({state}) => ReactDOM.render(
-      React.createElement(
-        view,
-        {...stateSerializer(state), eventStream: streamWrapper}
-      ),
-      container
-    ))
+    .do(({state}) => component.setState(state))
     .do(({effects=[]}) =>
       effects.forEach((e) =>
         Rx.Observable.spawn(e(streamWrapper)).subscribe(
@@ -83,6 +104,7 @@ export function tanok(initialState, update, view, options) {
   return {
     disposable: streamWrapper.disposable,
     eventStream,
+    component,
   };
 }
 
