@@ -52,13 +52,6 @@ export function tanok(initialState, update, view, options) {
   const eventStream = new Rx.Subject();
   const rootParent = null;
   let dispatcher = dispatch(eventStream, update, rootParent);
-
-  if (outerEventStream) {
-    dispatcher = Rx.Observable.merge(
-      dispatcher,
-      dispatch(outerEventStream, update, rootParent)
-    );
-  }
   const streamWrapper = new StreamWrapper(eventStream, rootParent);
 
   const component = ReactDOM.render(
@@ -102,6 +95,14 @@ export function tanok(initialState, update, view, options) {
     );
 
   streamWrapper.send('init');
+
+
+  if (outerEventStream) {
+    outerEventStream.subscribe(
+      streamWrapper.stream.onNext,
+      console.error.bind(console)
+    )
+  }
 
   return {
     disposable: streamWrapper.disposable,

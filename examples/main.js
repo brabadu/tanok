@@ -26,7 +26,26 @@ import {
   CountersCollection,
 } from './4_subcomponent_collection/subcomponents.js';
 
+// basic usage
 tanok(init_1(), (new CounterDispatcher1).collect(), Counter1);
+
+// Using effects (asynchronous events)
 tanok(init_2(), (new CounterDispatcher2).collect(), Counter2);
+
+// Simple subcomponents
 tanok(init_3(), (new Dashboard).collect(), TwoCounters);
+
+// Subcomponents for handling collection of subitems
 tanok(init_4(), (new Dashboard2).collect(), CountersCollection);
+
+
+
+// Outer event stream example
+import Rx from 'rx';
+
+const ticks = Rx.Observable.interval(1000).map({
+  parent: null,
+  action: 'inc'
+});
+
+tanok(init_1(), (new CounterDispatcher1).collect(), Counter1, {outerEventStream: ticks});
