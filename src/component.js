@@ -16,7 +16,7 @@ import { StreamWrapper } from './streamWrapper.js';
  * */
 export default function tanokComponent(target) {
   target.propTypes = target.propTypes || {};
-  target.propTypes.eventStream = React.PropTypes.instanceOf(StreamWrapper).isRequired;
+  target.propTypes.eventStream = React.PropTypes.instanceOf(StreamWrapper);
 
   target.displayName = `TanokComponent(${target.displayName || target.name})`;
 
@@ -25,8 +25,14 @@ export default function tanokComponent(target) {
   };
 
   target.prototype.subStream = function subStream(parent, updateHandlers) {
+    console.warn('stream.subStream function is deprecated. Use subcomponentFx effect.');
     return this.props.eventStream.subStream(parent, updateHandlers);
   };
+
+  target.prototype.sub = function sub(name) {
+    const stream = this.props.eventStream;
+    return stream && stream.subs[name];
+  }
 
   return target;
 }

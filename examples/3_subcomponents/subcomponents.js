@@ -1,6 +1,6 @@
 import React from 'react';
 import tanokComponent from '../../lib/component.js';
-import {on, TanokDispatcher, effectWrapper} from '../../lib/tanok.js';
+import {on, TanokDispatcher, effectWrapper, subcomponentFx} from '../../lib/tanok.js';
 
 import {init as counterInit,
         CounterDispatcher, Counter} from '../2_effects/counter-effects.js';
@@ -14,6 +14,14 @@ export function init() {
 }
 
 export class Dashboard extends TanokDispatcher {
+  @on('init')
+  init(payload, state) {
+    return [state,
+      subcomponentFx('top', (new CounterDispatcher).collect()),
+      subcomponentFx('bottom', (new CounterDispatcher).collect()),
+    ]
+  }
+
   @on('top')
   top(payload, state) {
     const [newState, ...effects] = payload(state.top);
@@ -31,23 +39,10 @@ export class Dashboard extends TanokDispatcher {
 
 @tanokComponent
 export class TwoCounters extends React.Component {
-
-  componentWillMount() {
-    this.setState({
-      topEs: this.subStream('top', (new CounterDispatcher).collect()),
-      bottomEs: this.subStream('bottom', (new CounterDispatcher).collect())
-    })
-  }
-
-  componentWillUnmount() {
-    this.state.topEs.disposable();
-    this.state.bottomEs.disposable();
-  }
-
   render() {
         return <div>
-          <Counter {...this.props.top} eventStream={this.state.topEs} />
-          <Counter {...this.props.bottom} eventStream={this.state.bottomEs} />
+          <Counter {...this.props.top} eventStream={this.sub('top')} />
+          <Counter {...this.props.bottom} eventStream={this.sub('bottom')} />
         </div>
     }
 }

@@ -8,6 +8,7 @@ import {
   debounce,
   throttle,
   rethrowFx,
+  subcomponentFx,
 } from './helpers';
 import TanokMixin from './mixin';
 
@@ -23,6 +24,7 @@ export {
   debounce,
   throttle,
   rethrowFx,
+  subcomponentFx,
 
   tanokComponent,
   TanokMixin,

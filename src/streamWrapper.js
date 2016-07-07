@@ -19,6 +19,7 @@ export class StreamWrapper {
     this.stream = stream;
     this.parent = parent;
     this.disposable = null;
+    this.subs = {};
   }
 
   subStream(subParent, subUpdate) {
@@ -34,6 +35,8 @@ export class StreamWrapper {
     }
 
     const subStreamWrapper = new StreamWrapper(this.stream, subParent);
+    this.subs[subParent] = subStreamWrapper;
+
     subStreamWrapper.disposable = dispatchSub(this.stream, subUpdate, subParent)
       .do(([stateMutator, params]) =>
         this.stream.onNext({

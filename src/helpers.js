@@ -33,3 +33,9 @@ export function rethrowFx(action, payload) {
     stream.send(action, payload)
   }
 }
+
+export function subcomponentFx(subParent, dispatchSub) {
+  return function (stream) {
+    stream.subStream(subParent, dispatchSub)
+  }
+}
