@@ -1,6 +1,5 @@
 import React from 'react'
-import tanokComponent from '../../lib/component.js';
-import {on, TanokDispatcher} from '../../lib/tanok.js';
+import {on, TanokDispatcher, tanokComponent} from '../../lib/tanok.js';
 
 
 /*
@@ -60,6 +59,33 @@ export class CounterDispatcher extends TanokDispatcher {
     state.synced = true;
     return [state];
   }
+
+  @on('effectKinds')
+  promise(payload, state) {
+    function promiseFx(stream){
+      return new Promise((resolve, reject) => {
+        stream.send('done', 'Promise done')
+        return resolve(1);
+      })
+    }
+
+    function observableFx(stream) {
+      return Rx.Observable.create((obs) => {
+        stream.send('done', 'Observable done')
+        obs.onNext(1);
+        obs.onCompleted();
+      })
+    }
+
+    return [state, promiseFx, observableFx];
+  }
+
+  @on('done')
+  done(payload, state) {
+    console.log(payload)
+    return [state];
+  }
+
 }
 
 /*
@@ -71,6 +97,7 @@ export class Counter extends React.Component {
     super(props);
     this.onPlusClick = this.onPlusClick.bind(this);
     this.onMinusClick = this.onMinusClick.bind(this);
+    this.onEffectsClick = this.onEffectsClick.bind(this);
   }
   onPlusClick() {
     this.send('inc')
@@ -78,12 +105,16 @@ export class Counter extends React.Component {
   onMinusClick() {
     this.send('dec')
   }
+  onEffectsClick() {
+    this.send('effectKinds')
+  }
   render() {
     return (
       <div>
         <button onClick={this.onMinusClick}>-</button>
         <span style={{color: this.props.synced ? 'green' : 'red'}}>{this.props.count}</span>
         <button onClick={this.onPlusClick}>+</button>
+        <button onClick={this.onEffectsClick}>Different kinds of effect</button>
       </div>
     )
   }
