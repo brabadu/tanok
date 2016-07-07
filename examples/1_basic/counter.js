@@ -1,6 +1,5 @@
 import React from 'react'
-import {on, TanokDispatcher} from '../../lib/tanok.js';
-import tanokComponent from '../../lib/component.js';
+import {on, TanokDispatcher, tanokComponent} from '../../lib/tanok.js';
 
 /*
   Model

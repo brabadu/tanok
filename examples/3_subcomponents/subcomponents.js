@@ -1,6 +1,5 @@
 import React from 'react';
-import tanokComponent from '../../lib/component.js';
-import {on, TanokDispatcher, effectWrapper, subcomponentFx} from '../../lib/tanok.js';
+import {on, TanokDispatcher, effectWrapper, subcomponentFx, tanokComponent} from '../../lib/tanok.js';
 
 import {init as counterInit,
         CounterDispatcher, Counter} from '../2_effects/counter-effects.js';

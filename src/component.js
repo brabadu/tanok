@@ -14,7 +14,7 @@ import { StreamWrapper } from './streamWrapper.js';
  * }
  *
  * */
-export default function tanokComponent(target) {
+export function tanokComponent(target) {
   target.propTypes = target.propTypes || {};
   target.propTypes.eventStream = React.PropTypes.instanceOf(StreamWrapper);
 
