@@ -89,10 +89,9 @@ export function tanok(initialState, update, view, options) {
     .do(({effects=[]}) =>
       effects.forEach((e) =>
         Rx.Observable.spawn(e(streamWrapper))
-        .filter(Rx.Observable.isObservable)
-        .map((obs) => obs.subscribe())
+        .flatMap((obs) => obs)
         .subscribe(
-          () => {debugger},
+          Rx.helpers.noop,
           console.error.bind(console)
         )
       )
