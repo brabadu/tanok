@@ -16,10 +16,6 @@ const entries = [
     moduleName: 'tanok',
   },
   {
-    entry: 'src/mixin.js',
-    moduleName: 'tanokMixin',
-  },
-  {
     entry: 'src/helpers.js',
     moduleName: 'tanokHelpers',
   },

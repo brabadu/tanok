@@ -10,7 +10,6 @@ import {
   rethrowFx,
   subcomponentFx,
 } from './helpers';
-import TanokMixin from './mixin';
 
 export {
   tanok,
@@ -27,5 +26,4 @@ export {
   subcomponentFx,
 
   tanokComponent,
-  TanokMixin,
 };
