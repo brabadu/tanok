@@ -52,5 +52,5 @@ entries.forEach((entry) => {
     format: 'umd',
     moduleName: entry.moduleName,
     dest: entry.entry.replace('src', 'lib'),
-  }))
+  })).catch((e) => console.log(e))
 })

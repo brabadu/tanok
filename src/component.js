@@ -19,3 +19,7 @@ export default function Wrapper(Wrapped) {
 
   return TanokComponent;
 }
+
+export {
+  Wrapper as tanokComponent
+}

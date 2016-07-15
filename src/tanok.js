@@ -4,9 +4,19 @@ import ReactDOM from 'react-dom';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
 import { on } from './decorators';
 
+import {tanokComponent} from './component';
+import TanokMixin from './mixin';
+import {
+  acitonIs,
+  parentIs,
+  filter,
+  debounce,
+  throttle,
+} from './helpers';
+
 const identity = (value) => value;
 
-export function tanok(initialState, update, view, options) {
+function tanok(initialState, update, view, options) {
   let { container, outerEventStream, stateSerializer = identity } = options || {};
   if (!container) {
     container = document.createElement('div');
@@ -46,7 +56,7 @@ export function tanok(initialState, update, view, options) {
   return { disposable, eventStream };
 }
 
-export function effectWrapper(effect, parent) {
+function effectWrapper(effect, parent) {
   return ({ stream }) => {
     return effect
       ? effect(new StreamWrapper(stream, parent))
@@ -68,7 +78,7 @@ export function effectWrapper(effect, parent) {
 * var helloWorldDispatcher = new HelloWorldDispatcher();
 * tanok(HelloWorldModel, helloWorldDispatcher.collect(), ViewComponent, {container})
 * */
-export class TanokDispatcher {
+class TanokDispatcher {
   collect() {
     return this.events.map(([predicate, stateMutator]) => [predicate, stateMutator.bind(this)]);
   }
@@ -76,5 +86,17 @@ export class TanokDispatcher {
 
 export {
   tanok as default,
+  tanok,
+  effectWrapper,
+  TanokDispatcher,
   on,
+
+  acitonIs,
+  parentIs,
+  filter,
+  debounce,
+  throttle,
+
+  tanokComponent,
+  TanokMixin,
 };
