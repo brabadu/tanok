@@ -26,7 +26,7 @@ export function tanokComponent(target) {
       console.error(`Use 'tanokStream' argument instead of 'eventStream' (${target.displayName})`);
     }
     const stream = this.props.tanokStream || this.props.eventStream;
-    steam.send(action, payload, metadata);
+    stream.send(action, payload, metadata);
   };
 
   target.prototype.subStream = function subStream(parent, updateHandlers) {
