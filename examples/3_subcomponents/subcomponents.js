@@ -40,8 +40,8 @@ export class Dashboard extends TanokDispatcher {
 export class TwoCounters extends React.Component {
   render() {
         return <div>
-          <Counter {...this.props.top} eventStream={this.sub('top')} />
-          <Counter {...this.props.bottom} eventStream={this.sub('bottom')} />
+          <Counter {...this.props.top} tanokStream={this.sub('top')} />
+          <Counter {...this.props.bottom} tanokStream={this.sub('bottom')} />
         </div>
     }
 }

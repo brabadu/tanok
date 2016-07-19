@@ -1,5 +1,5 @@
 import React from 'react';
-import {on, TanokDispatcher, effectWrapper, tanokComponent} from '../../lib/tanok.js';
+import {on, TanokDispatcher, effectWrapper, subcomponentFx, rethrowFx, tanokComponent} from '../../lib/tanok.js';
 
 import {init as counterInit,
         CounterDispatcher, Counter} from './counter-collection.js';
@@ -12,30 +12,32 @@ export function init() {
 }
 
 export class Dashboard extends TanokDispatcher {
+  @on('init')
+  init(payload, state) {
+    return [state,
+      subcomponentFx('countersChange', (new CounterDispatcher).collect()),
+    ]
+  }
+
   @on('countersChange')
   countersChange(payload, state, {metadata}) {
     const [newState, ...effects] = payload(state.counters[metadata]);
     state.counters[metadata] = newState;
     return [state, ...effects.map((e) => effectWrapper(e, 'countersChange'))]
   }
+
+  @on('rerender')
+  rerender(payload, state) {
+    return [state];
+  }
 }
 
 @tanokComponent
 export class CountersCollection extends React.Component {
-  componentWillMount() {
-    this.setState({
-      countersChange: this.subStream('countersChange', (new CounterDispatcher).collect()),
-    });
-  }
-
-  componentWillUnmount() {
-    this.state.countersChange.disposable();
-  }
-
   render() {
       return <div>
         {this.props.counters.map((counter) =>
-          <Counter key={counter.id} {...counter} eventStream={this.state.countersChange} />
+          <Counter key={counter.id} tanokStream={this.sub('countersChange')} {...counter} />
         )}
       </div>
   }
