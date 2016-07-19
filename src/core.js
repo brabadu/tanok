@@ -53,18 +53,7 @@ export function tanok(initialState, update, view, options) {
   const rootParent = null;
   let dispatcher = dispatch(eventStream, update, rootParent);
   const streamWrapper = new StreamWrapper(eventStream, rootParent);
-
-  const component = ReactDOM.render(
-    React.createElement(
-      Root,
-      {
-        view,
-        eventStream: streamWrapper,
-        ...stateSerializer(initialState),
-      }
-    ),
-    container
-  );
+  let component;
 
   dispatcher = dispatcher
     .scan((({state}, action) => {
@@ -78,7 +67,7 @@ export function tanok(initialState, update, view, options) {
   });
 
   streamWrapper.disposable = dispatcher
-    .do(({state}) => component.setState(state))
+    .do(({state}) => component && component.setState(state))
     .do(({effects=[]}) =>
       effects.forEach((e) =>
         Rx.Observable.spawn(e(streamWrapper))
@@ -96,10 +85,21 @@ export function tanok(initialState, update, view, options) {
 
   streamWrapper.send('init');
 
+  component = ReactDOM.render(
+    React.createElement(
+      Root,
+      {
+        view,
+        tanokStream: streamWrapper,
+        ...stateSerializer(initialState),
+      }
+    ),
+    container
+  )
 
   if (outerEventStream) {
     outerEventStream.subscribe(
-      streamWrapper.stream.onNext,
+      streamWrapper.stream.onNext.bind(streamWrapper.stream),
       console.error.bind(console)
     )
   }
@@ -134,6 +134,22 @@ export function effectWrapper(effect, parent) {
 * tanok(HelloWorldModel, helloWorldDispatcher.collect(), ViewComponent, {container})
 * */
 export class TanokDispatcher {
+  [Symbol.iterator]() {
+    function makeIterator(array){
+        var nextIndex = 0;
+
+        return {
+           next: function(){
+               return nextIndex < array.length ?
+                   {value: array[nextIndex++], done: false} :
+                   {done: true};
+           }
+        };
+    }
+
+    return makeIterator(this.collect());
+  }
+
   collect() {
     return this.events.map(([predicate, stateMutator]) => [predicate, stateMutator.bind(this)]);
   }

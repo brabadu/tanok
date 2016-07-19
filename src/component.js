@@ -31,7 +31,9 @@ export function tanokComponent(target) {
 
   target.prototype.subStream = function subStream(parent, updateHandlers) {
     console.error(`stream.subStream function is deprecated. Use subcomponentFx effect (${target.displayName})`);
-    return this.props.eventStream.subStream(parent, updateHandlers);
+
+    const stream = this.props.tanokStream || this.props.eventStream;
+    return stream.subStream(parent, updateHandlers);
   };
 
   target.prototype.sub = function sub(name) {
