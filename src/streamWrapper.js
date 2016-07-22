@@ -1,6 +1,12 @@
 import Rx from 'rx';
 import { actionIs } from './helpers.js';
 
+const WRONG_UPDATE_HANDLER = 'Dispatcher must be subclass of TanokDispatcher or iterable';
+
+function isIterable (object) {
+  return object != null && typeof object[Symbol.iterator] === 'function';
+}
+
 function isFunction(x) {
   return Object.prototype.toString.call(x) === '[object Function]';
 }
@@ -10,6 +16,10 @@ function maybeWrapActionIs(condition) {
 }
 
 function commonDispatch(stream, updateHandlers, filterParent, mapperFn) {
+  if (!isIterable(updateHandlers)) {
+    throw new Error(WRONG_UPDATE_HANDLER)
+  }
+
   const parentStream = stream.filter(({ parent }) => parent === filterParent);
   const dispatcherArray = Array.from(updateHandlers)
     .map(([actionCondition, actionHandler]) =>
