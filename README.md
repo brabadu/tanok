@@ -17,10 +17,10 @@ usable child components and fast HTML rendering.
 
 # Usage
 
-To start with something small and simple we'll make a counter (see file `/examples/simple/simple.js`). First we need a place to store our data.
+To start with something small and simple we'll make a counter (see file `examples/1_basic/counter.js`). First we need a place to store our data.
 
-`model.js`
-```
+
+```js
 export default model = {
   count: 0,
 };
@@ -28,23 +28,20 @@ export default model = {
 
 Next we need rules to update our model
 
-`dispatcher.js`
-```
-
-import {TanokDispatcher} from 'tanok';
-import {on} from 'tanok/lib/decorators';
+```js
+import {TanokDispatcher, on} from 'tanok';
 
 class CounterDispatcher extends TanokDispatcher {
 
     @on('inc')
-    increment(eventPayload, state) {
-        state.count += 1;
+    increment(payload, state) {
+        state.count += payload;
         return [state];
     }
 
     @on('dec')
-    decrement(eventPayload, state) {
-        state.count -= 1;
+    decrement(payload, state) {
+        state.count -= payload;
         return [state];
     }
 }
@@ -54,9 +51,8 @@ export default CounterDispatcher;
 
 Last crucial thing for UI is it's visual representation
 
-`view.js`
-```
-import tanokComponent from 'tanok/lib/component';
+```js
+import {tanokComponent} from 'tanok';
 
 @tanokComponent
 class Counter extends React.Component {
@@ -67,11 +63,11 @@ class Counter extends React.Component {
     }
 
     onPlusClick() {
-        this.send('inc');
+        this.send('inc', 1);
     }
 
     onMinusClick() {
-        this.send('dec');
+        this.send('dec', 1);
     }
 
     render() {
@@ -92,24 +88,67 @@ export default Counter;
 
 Now on to dancing
 
-```
-import tanok from 'tanok';
+```js
+import {tanok} from 'tanok';
 import Counter from './view';
 import Dispatcher from './dispatcher';
 import model from './model';
 
 
-const mountNode = document.createElement('div');
-document.body.appendChild(mountNode);
-const counterDispatcher = new Dispatcher();
+const root = document.getElementById('root');
 
-tanok(model, counterDispatcher.collect(), Counter, mountNode);
+tanok(model, new Dispatcher(), Counter, {
+  container: root
+});
 ```
 
-This is simple version of tanok. Inside `tanok` function rx.js stream is created, all events go through it and dispatched according to `dispatcher` provided. Than dispatcher returns appropriate function and it is applied to current application state to produce new state. New application state is used to render new interface. This way you can add handlers only to synchronous events like mouse clicks or keyboard typing. It is very limited, and is made mainly for educational purposes.
+## Async stuff
 
-Any serious real-world app needs async calls to server, setTimeout etc. To make it possible we need a thing we call *Effect*
+Now how to make asynchronous calls, like ajax requests, setTimeouts and others?
 
+State mutators return an array with state as it's first item. This state goes
+right into React component `setState`, which triggers component rerendering.
+Other members of array may be functions (*effects*), which are called sequentially after `setState`.
+
+They get stream as a parameter, so they can make ajax call and do `stream.send`
+back to the dispatcher. This is how effect might look like.
+
+```js
+function syncEffect(cnt) {
+  return function (stream) {
+    fetch('http://www.mocky.io/v2/577824a4120000ca28aac904', {
+      method: 'POST',
+      body: cnt,
+    })
+      .then((r) => r.json())
+      .then((json) => stream.send('syncSuccess', json))
+  }
+}
+```
+
+To run effect we return new state with effect function
+
+ ```js
+export class CounterDispatcher extends TanokDispatcher {
+  @on('inc')
+  inc(payload, state) {
+    state.count += 1;
+    state.synced = false;
+
+    return [state, syncEffect(state.count)];
+  }
+
+  @on('syncSuccess')
+  syncSuccess(payload, state) {
+    state.synced = true;
+    return [state];
+  }
+
+  ...
+}
+ ```
+
+ Effects usually have to change state somehow, so they get stream as parameter. So they can call `stream.send(ACTION, payload)` to update state and trigger another rerendering.
 
 # Authors
 

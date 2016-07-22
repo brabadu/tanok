@@ -25,11 +25,6 @@ export class Dashboard extends TanokDispatcher {
     state.counters[metadata] = newState;
     return [state, ...effects.map((e) => effectWrapper(e, 'countersChange'))]
   }
-
-  @on('rerender')
-  rerender(payload, state) {
-    return [state];
-  }
 }
 
 @tanokComponent
