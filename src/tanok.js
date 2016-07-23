@@ -2,7 +2,7 @@ import {tanok, effectWrapper, TanokDispatcher} from './core';
 import {tanokComponent} from './component';
 import {on} from './decorators';
 import {
-  acitonIs,
+  actionIs,
   parentIs,
   filter,
   debounce,
@@ -17,7 +17,7 @@ export {
   TanokDispatcher,
   on,
 
-  acitonIs,
+  actionIs,
   parentIs,
   filter,
   debounce,
