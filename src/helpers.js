@@ -28,9 +28,9 @@ export function throttle(time) {
   };
 }
 
-export function rethrowFx(action, payload) {
+export function rethrowFx(action, payload, metadata) {
   return function (stream) {
-    stream.send(action, payload)
+    stream.send(action, payload, metadata)
   }
 }
 
