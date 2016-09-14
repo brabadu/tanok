@@ -7,7 +7,7 @@ import { on } from './decorators';
 import {tanokComponent} from './component';
 import TanokMixin from './mixin';
 import {
-  acitonIs,
+  actionIs,
   parentIs,
   filter,
   debounce,
@@ -91,7 +91,7 @@ export {
   TanokDispatcher,
   on,
 
-  acitonIs,
+  actionIs,
   parentIs,
   filter,
   debounce,
