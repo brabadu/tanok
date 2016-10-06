@@ -67,7 +67,7 @@ export function tanok(initialState, update, view, options) {
   });
 
   streamWrapper.disposable = dispatcher
-    .do(({state}) => component && component.setState(state))
+    .do(({state}) => component && component.setState(stateSerializer(state)))
     .do(({effects=[]}) =>
       effects.forEach((e) =>
         Rx.Observable.spawn(e(streamWrapper))
