@@ -91,6 +91,7 @@ export function tanok(initialState, update, view, options) {
       {
         view,
         tanokStream: streamWrapper,
+        eventStream: streamWrapper,
         ...stateSerializer(initialState),
       }
     ),
