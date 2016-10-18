@@ -113,9 +113,14 @@ export function tanok(initialState, update, view, options) {
 }
 
 export function effectWrapper(effect, parent) {
-  return ({ stream }) => {
+  return (streamWrapper) => {
+    const substream = streamWrapper.subs[parent];
+    if (!substream) {
+      throw new Error(`No such substream '${parent}'`)
+    }
+
     return effect
-      ? effect(new StreamWrapper(stream, parent))
+      ? effect(substream)
       : Rx.helpers.noop;
   };
 }
