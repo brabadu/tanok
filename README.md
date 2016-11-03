@@ -21,7 +21,7 @@ To start with something small and simple we'll make a counter (see file `example
 
 
 ```js
-export default model = {
+export const Model = {
   count: 0,
 };
 ```
@@ -90,14 +90,14 @@ Now on to dancing
 
 ```js
 import {tanok} from 'tanok';
-import Counter from './view';
-import Dispatcher from './dispatcher';
-import model from './model';
+import {Counter} from './view';
+import {CounterDispatcher} from './dispatcher';
+import {Model} from './model';
 
 
 const root = document.getElementById('root');
 
-tanok(model, new Dispatcher(), Counter, {
+tanok(Model, new CounterDispatcher(), Counter, {
   container: root
 });
 ```
@@ -159,4 +159,4 @@ Great people of Evo Company:
 * [Valeriy Morkovyn](http://github.com/Lex0ne)
 * [Anton Verinov](http://github.com/zemlanin)
 
-With thoughful tests and wise advices from many others.
+With thoughtful tests and wise advices from many others.
