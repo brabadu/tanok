@@ -26,8 +26,12 @@ import {
   CountersCollection,
 } from './4_subcomponent_collection/subcomponents.js';
 
+import { loggingMiddleware } from './7_middlewares/middlewares'
+
 // basic usage
-tanok(init_1(), (new CounterDispatcher1), Counter1);
+tanok(init_1(), (new CounterDispatcher1), Counter1, {
+  middlewares: [loggingMiddleware(1), loggingMiddleware(2)],
+});
 
 // Using effects (asynchronous events)
 tanok(init_2(), (new CounterDispatcher2), Counter2);
