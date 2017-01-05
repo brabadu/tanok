@@ -1,6 +1,7 @@
 import Rx from 'rx';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import compose from './compose';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
 
 const identity = (value) => value;
@@ -57,14 +58,12 @@ export function tanok(initialState, update, view, options) {
 
   dispatcher = dispatcher
     .scan((({state}, action) => {
-      const {state : newState, effects=[], params} = action(state);
+      const appliedMiddleware = compose(...middlewares)(action);
+      const {state: newState, effects, params: params} = appliedMiddleware(state);
       return {state: newState, effects, params: params}
     }), {state: initialState})
     .startWith({state: initialState});
 
-  middlewares.forEach((middleWare) => {
-    dispatcher = dispatcher.map(middleWare)
-  });
 
   streamWrapper.disposable = dispatcher
     .do(({state}) => component && component.setState(stateSerializer(state)))
