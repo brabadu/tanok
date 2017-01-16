@@ -55,10 +55,11 @@ export function tanok(initialState, update, view, options) {
   let dispatcher = dispatch(eventStream, update, rootParent);
   const streamWrapper = new StreamWrapper(eventStream, rootParent);
   let component;
+  const composedMiddlewares = compose(...middlewares);
 
   dispatcher = dispatcher
     .scan((({state}, action) => {
-      const appliedMiddleware = compose(...middlewares)(action);
+      const appliedMiddleware = composedMiddlewares(action);
       const {state: newState, effects, params: params} = appliedMiddleware(state);
       return {state: newState, effects, params: params}
     }), {state: initialState})
