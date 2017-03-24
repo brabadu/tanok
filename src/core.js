@@ -6,11 +6,10 @@ import { StreamWrapper, dispatch } from './streamWrapper.js';
 
 const identity = (value) => value;
 
-class Root extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = props;
-  }
+const Root = React.createClass({
+  getInitialState() {
+    return this.props;
+  },
 
   render() {
     return React.createElement(
@@ -18,7 +17,7 @@ class Root extends React.Component {
       this.state
     )
   }
-}
+});
 
 
 /**
@@ -55,7 +54,7 @@ export function tanok(initialState, update, view, options) {
   let dispatcher = dispatch(eventStream, update, rootParent);
   const streamWrapper = new StreamWrapper(eventStream, rootParent);
   let component;
-  const composedMiddlewares = compose(...middlewares);
+  const composedMiddlewares = compose.apply(undefined, middlewares);
 
   dispatcher = dispatcher
     .scan((({state}, action) => {
@@ -88,12 +87,13 @@ export function tanok(initialState, update, view, options) {
   component = ReactDOM.render(
     React.createElement(
       Root,
-      {
-        view,
-        tanokStream: streamWrapper,
-        eventStream: streamWrapper,
-        ...stateSerializer(initialState),
-      }
+      Object.assign({
+          view,
+          tanokStream: streamWrapper,
+          eventStream: streamWrapper,
+        },
+        stateSerializer(initialState)
+      )
     ),
     container
   )
@@ -125,38 +125,24 @@ export function effectWrapper(effect, parent) {
   };
 }
 
-/**
-* Usage example:
-* class HelloWorldDispatcher extends TanokDispatcher {
-*
-*   @on('helloEvent')
-*   helloWorld (eventPayload, state) {
-*     state.word = eventPayload.word;
-*     return [state, helloWorldEffect];
-*   }
-* }
-*
-* var helloWorldDispatcher = new HelloWorldDispatcher();
-* tanok(HelloWorldModel, helloWorldDispatcher.collect(), ViewComponent, {container})
-* */
-export class TanokDispatcher {
-  [Symbol.iterator]() {
-    function makeIterator(array){
-        var nextIndex = 0;
+export const TanokDispatcher = function() {};
 
-        return {
-           next: function(){
-               return nextIndex < array.length ?
-                   {value: array[nextIndex++], done: false} :
-                   {done: true};
-           }
-        };
-    }
+TanokDispatcher.prototype.collect = function () {
+  return this.events.map((args) => [args[0], args[1].bind(this)]);
+}
 
-    return makeIterator(this.collect());
+TanokDispatcher.prototype[Symbol.iterator] = function(){
+  function makeIterator(array){
+      var nextIndex = 0;
+
+      return {
+         next: function(){
+             return nextIndex < array.length ?
+                 {value: array[nextIndex++], done: false} :
+                 {done: true};
+         }
+      };
   }
 
-  collect() {
-    return this.events.map(([predicate, stateMutator]) => [predicate, stateMutator.bind(this)]);
-  }
+  return makeIterator(this.collect());
 }

@@ -1,6 +1,6 @@
 {
   "name": "tanok",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "Lightweight pattern for React+Rx.js front-end applications. Written under heavy impression of Elm Architecture",
   "main": "lib/tanok.js",
   "scripts": {
@@ -31,8 +31,8 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "react": "^0.14.0",
-    "react-dom": "^0.14.0",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
     "rx": "^4.0.6"
   },
   "devDependencies": {
@@ -46,8 +46,8 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
     "mocha": "^2.5.3",
-    "react": "^0.14.0",
-    "react-dom": "^0.14.0",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
     "rollup": "^0.31.2",
     "rollup-plugin-babel": "^2.5.1",
     "rollup-plugin-commonjs": "^3.0.0",
