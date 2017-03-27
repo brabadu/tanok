@@ -29,11 +29,11 @@ export function tanokComponent(target) {
     stream.send(action, payload, metadata);
   };
 
-  target.prototype.subStream = function subStream(parent, updateHandlers) {
+  target.prototype.subStream = function subStream(name, updateHandlers) {
     console.error(`stream.subStream function is deprecated. Use subcomponentFx effect (${target.displayName})`);
 
     const stream = this.props.tanokStream || this.props.eventStream;
-    return stream.subStream(parent, updateHandlers);
+    return stream.subStream(name, updateHandlers);
   };
 
   target.prototype.sub = function sub(name) {

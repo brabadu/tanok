@@ -50,9 +50,9 @@ export function tanok(initialState, update, view, options) {
   }
 
   const eventStream = new Rx.Subject();
-  const rootParent = null;
-  let dispatcher = dispatch(eventStream, update, rootParent);
-  const streamWrapper = new StreamWrapper(eventStream, rootParent);
+  const rootName = null;
+  let dispatcher = dispatch(eventStream, update, rootName);
+  const streamWrapper = new StreamWrapper(eventStream, rootName);
   let component;
   const composedMiddlewares = compose.apply(undefined, middlewares);
 
@@ -112,11 +112,11 @@ export function tanok(initialState, update, view, options) {
   };
 }
 
-export function effectWrapper(effect, parent) {
+export function effectWrapper(effect, streamName) {
   return (streamWrapper) => {
-    const substream = streamWrapper.subs[parent];
+    const substream = streamWrapper.subs[streamName];
     if (!substream) {
-      throw new Error(`No such substream '${parent}'`)
+      throw new Error(`No such substream '${streamName}'`)
     }
 
     return effect

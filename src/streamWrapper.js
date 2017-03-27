@@ -15,26 +15,26 @@ function maybeWrapActionIs(condition) {
   return isFunction(condition) ? condition : actionIs(condition);
 }
 
-function commonDispatch(stream, updateHandlers, filterParent, mapperFn) {
+function commonDispatch(stream, updateHandlers, filterName, mapperFn) {
   if (!isIterable(updateHandlers)) {
     throw new Error(WRONG_UPDATE_HANDLER)
   }
 
-  const parentStream = stream.filter(({ parent }) => parent === filterParent);
+  const currentStream = stream.filter(({ streamName }) => streamName === filterName);
   const dispatcherArray = Array.from(updateHandlers)
     .map((actionPair) => {
       const actionCondition = actionPair[0];
       const actionHandler = actionPair[1];
       return actionCondition
-        .reduce((accStream, cond) => maybeWrapActionIs(cond).call(accStream), parentStream)
+        .reduce((accStream, cond) => maybeWrapActionIs(cond).call(accStream), currentStream)
         .map(mapperFn(actionHandler))
     });
   return Rx.Observable.merge.apply(undefined, dispatcherArray);
 }
 
-export function dispatch(stream, updateHandlers, filterParent) {
+export function dispatch(stream, updateHandlers, filterName) {
   return commonDispatch(
-    stream, updateHandlers, filterParent,
+    stream, updateHandlers, filterName,
     (actionHandler) => (params) => (state) => {
       const actionResult = actionHandler(params.payload, state, params);
       const newState = actionResult[0];
@@ -43,9 +43,9 @@ export function dispatch(stream, updateHandlers, filterParent) {
   })
 }
 
-function dispatchSub(stream, updateHandlers, filterParent) {
+function dispatchSub(stream, updateHandlers, filterName) {
   return commonDispatch(
-    stream, updateHandlers, filterParent,
+    stream, updateHandlers, filterName,
     (actionHandler) => (params) => {
       return [(state) => actionHandler(params.payload, state, params), params];
     }
@@ -53,25 +53,25 @@ function dispatchSub(stream, updateHandlers, filterParent) {
 }
 
 
-export const StreamWrapper = function(stream, parent) {
+export const StreamWrapper = function(stream, streamName) {
     this.stream = stream;
-    this.parent = parent;
+    this.streamName = streamName;
     this.disposable = null;
     this.subs = {};
 }
 
-StreamWrapper.prototype.subStream = function(subParent, subUpdate) {
-    const subStreamWrapper = new StreamWrapper(this.stream, subParent);
-    this.subs[subParent] = subStreamWrapper;
+StreamWrapper.prototype.subStream = function(subName, subUpdate) {
+    const subStreamWrapper = new StreamWrapper(this.stream, subName);
+    this.subs[subName] = subStreamWrapper;
 
-    subStreamWrapper.disposable = dispatchSub(this.stream, subUpdate, subParent)
+    subStreamWrapper.disposable = dispatchSub(this.stream, subUpdate, subName)
       .do((parentPayload) => {
         const stateMutator = parentPayload[0];
         const params = parentPayload[1];
         return this.stream.onNext({
-          action: subParent,
+          action: subName,
           payload: stateMutator,
-          parent: this.parent,
+          streamName: this.streamName,
           metadata: params.metadata,
           stack: params,
         })
@@ -87,5 +87,5 @@ StreamWrapper.prototype.subStream = function(subParent, subUpdate) {
 };
 
 StreamWrapper.prototype.send = function(action, payload, metadata = null) {
-    this.stream.onNext({ action, payload, parent: this.parent, metadata });
+    this.stream.onNext({ action, payload, streamName: this.streamName, metadata });
 }

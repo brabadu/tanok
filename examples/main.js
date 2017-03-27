@@ -48,7 +48,7 @@ tanok(init_4(), (new Dashboard2), CountersCollection);
 import Rx from 'rx';
 
 const ticks = Rx.Observable.interval(1000).map(() => { return {
-  parent: null,
+  streamName: null,
   action: 'inc'
 }});
 tanok(init_1(), (new CounterDispatcher1), Counter1, {outerEventStream: ticks});

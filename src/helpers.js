@@ -4,9 +4,16 @@ export function actionIs(actionName) {
   };
 }
 
-export function parentIs(parentName) {
+export function parentIs(awaitedName) {
+  console.warning('This function is deprecated, use `nameIs` instead')
   return function () {
-    return this.filter(({parent}) => parent === parentName);
+    return this.filter(({streamName}) => streamName === awaitedName);
+  };
+}
+
+export function nameIs(awaitedName) {
+  return function () {
+    return this.filter(({streamName}) => streamName === awaitedName);
   };
 }
 
@@ -34,8 +41,8 @@ export function rethrowFx(action, payload, metadata) {
   }
 }
 
-export function subcomponentFx(subParent, dispatchSub) {
+export function subcomponentFx(subName, dispatchSub) {
   return function (stream) {
-    stream.subStream(subParent, dispatchSub)
+    stream.subStream(subName, dispatchSub)
   }
 }
