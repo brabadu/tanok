@@ -5,6 +5,8 @@ import {init as counterInit,
         CounterDispatcher, Counter} from './counter-collection.js';
 
 
+const COUNTERS_CHANGE = 'countersChange';
+
 export function init() {
   return {
     counters: Array.from({length: 10}).map((_, ind) => counterInit(ind)),
@@ -15,11 +17,11 @@ export class Dashboard extends TanokDispatcher {
   @on('init')
   init(payload, state) {
     return [state,
-      subcomponentFx('countersChange', (new CounterDispatcher).collect()),
+      subcomponentFx(COUNTERS_CHANGE, (new CounterDispatcher).collect()),
     ]
   }
 
-  @on('countersChange')
+  @on(COUNTERS_CHANGE)
   countersChange(payload, state, {metadata}) {
     const [newState, ...effects] = payload(state.counters[metadata]);
     state.counters[metadata] = newState;
