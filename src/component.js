@@ -25,8 +25,13 @@ export function tanokComponent(target) {
     if (!this.props.tanokStream && this.props.eventStream) {
       console.error(`Use 'tanokStream' argument instead of 'eventStream' (${target.displayName})`);
     }
+
+    if (metadata !== null) {
+      console.error('Hey! You no longer can pass metadata `.send()`, use `.sub()`');
+    }
+
     const stream = this.props.tanokStream || this.props.eventStream;
-    stream.send(action, payload, metadata);
+    stream.send(action, payload);
   };
 
   target.prototype.subStream = function subStream(name, updateHandlers) {
@@ -36,12 +41,16 @@ export function tanokComponent(target) {
     return stream.subStream(name, updateHandlers);
   };
 
-  target.prototype.sub = function sub(name) {
+  target.prototype.sub = function sub(name, metadata = null) {
     if (!this.props.tanokStream && this.props.eventStream) {
       console.error(`Use 'tanokStream' argument instead of 'eventStream' (${target.displayName})`);
     }
 
     const stream = this.props.tanokStream || this.props.eventStream;
+
+    if (metadata !== null) {
+      return stream && stream.subWithMeta(name, metadata);
+    }
     return stream && stream.subs[name];
   }
 

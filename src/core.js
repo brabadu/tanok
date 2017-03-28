@@ -53,6 +53,8 @@ export function tanok(initialState, update, view, options) {
   const rootName = null;
   let dispatcher = dispatch(eventStream, update, rootName);
   const streamWrapper = new StreamWrapper(eventStream, rootName);
+  streamWrapper.metadata.push(null);
+
   let component;
   const composedMiddlewares = compose.apply(undefined, middlewares);
 
@@ -112,9 +114,14 @@ export function tanok(initialState, update, view, options) {
   };
 }
 
-export function effectWrapper(effect, streamName) {
+export function effectWrapper(effect, streamName, metadata = null) {
   return (streamWrapper) => {
-    const substream = streamWrapper.subs[streamName];
+    let substream;
+    if (metadata !== null) {
+      substream = streamWrapper.subWithMeta(streamName, metadata);
+    } else {
+      substream = streamWrapper.subs[streamName];
+    }
     if (!substream) {
       throw new Error(`No such substream '${streamName}'`)
     }

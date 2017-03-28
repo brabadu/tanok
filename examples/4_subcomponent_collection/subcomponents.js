@@ -25,7 +25,7 @@ export class Dashboard extends TanokDispatcher {
   countersChange(payload, state, {metadata}) {
     const [newState, ...effects] = payload(state.counters[metadata]);
     state.counters[metadata] = newState;
-    return [state, ...effects.map((e) => effectWrapper(e, 'countersChange'))]
+    return [state, ...effects.map((e) => effectWrapper(e, COUNTERS_CHANGE, metadata))]
   }
 }
 
@@ -34,7 +34,7 @@ export class CountersCollection extends React.Component {
   render() {
       return <div>
         {this.props.counters.map((counter) =>
-          <Counter key={counter.id} tanokStream={this.sub('countersChange')} {...counter} />
+          <Counter key={counter.id} tanokStream={this.sub(COUNTERS_CHANGE, counter.id)} {...counter} />
         )}
       </div>
   }

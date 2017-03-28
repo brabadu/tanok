@@ -57,11 +57,14 @@ export const StreamWrapper = function(stream, streamName) {
     this.stream = stream;
     this.streamName = streamName;
     this.disposable = null;
+    this.metadata = [];
     this.subs = {};
+    this.subsWithMeta = new WeakMap();
 }
 
 StreamWrapper.prototype.subStream = function(subName, subUpdate) {
     const subStreamWrapper = new StreamWrapper(this.stream, subName);
+    subStreamWrapper.metadata = Array.prototype.concat(this.metadata, null);
     this.subs[subName] = subStreamWrapper;
 
     subStreamWrapper.disposable = dispatchSub(this.stream, subUpdate, subName)
@@ -72,7 +75,8 @@ StreamWrapper.prototype.subStream = function(subName, subUpdate) {
           action: subName,
           payload: stateMutator,
           streamName: this.streamName,
-          metadata: params.metadata,
+          metadata: params.metadataArray[params.metadataArray.length - 1],
+          metadataArray: params.metadataArray.slice(0, -1),
           stack: params,
         })
       })
@@ -86,6 +90,31 @@ StreamWrapper.prototype.subStream = function(subName, subUpdate) {
     return subStreamWrapper;
 };
 
-StreamWrapper.prototype.send = function(action, payload, metadata = null) {
-    this.stream.onNext({ action, payload, streamName: this.streamName, metadata });
+StreamWrapper.prototype.send = function(action, payload) {
+  this.stream.onNext({
+    action,
+    payload,
+    streamName: this.streamName,
+    metadataArray: this.metadata,
+  });
+}
+
+StreamWrapper.prototype.subWithMeta = function(sub, metadata) {
+  const subStream = this.subs[sub];
+  if (!subStream) {
+    return null;
+  }
+
+  const key = {sub, metadata};
+  const storage = this.subsWithMeta;
+  if (storage.has(key)) {
+    return storage.get(key)
+  }
+
+  const mock = new StreamWrapper(subStream.stream, subStream.streamName);
+  mock.metadata = this.metadata.concat(metadata);
+  mock.subs = subStream.subs;
+
+  storage.set(key, mock);
+  return mock;
 }

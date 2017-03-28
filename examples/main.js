@@ -26,6 +26,12 @@ import {
   CountersCollection,
 } from './4_subcomponent_collection/subcomponents.js';
 
+import {
+  init as init_5,
+  Dashboard as Dashboard3,
+  TwoColumns,
+} from './4_subcomponent_collection/two_columns.js';
+
 import { loggingMiddleware } from './7_middlewares/middlewares'
 
 // basic usage
@@ -41,8 +47,7 @@ tanok(init_3(), (new Dashboard), TwoCounters);
 
 // Subcomponents for handling collection of subitems
 tanok(init_4(), (new Dashboard2), CountersCollection);
-
-
+tanok(init_5(), new Dashboard3, TwoColumns);
 
 // Outer event stream example
 import Rx from 'rx';
