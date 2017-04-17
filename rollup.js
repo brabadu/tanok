@@ -8,28 +8,12 @@ const peerDependencies = Object.keys(require('./package.json').peerDependencies)
 
 const entries = [
   {
-    entry: 'src/core.js',
-    moduleName: 'core',
-  },
-  {
     entry: 'src/tanok.js',
     moduleName: 'tanok',
   },
   {
-    entry: 'src/helpers.js',
-    moduleName: 'tanokHelpers',
-  },
-  {
-    entry: 'src/decorators.js',
-    moduleName: 'tanokDecorators',
-  },
-  {
     entry: 'src/streamWrapper.js',
     moduleName: 'tanokStreamWrapper',
-  },
-  {
-    entry: 'src/component.js',
-    moduleName: 'tanokComponent',
   },
 ]
 const external = entries.map((p) => path.resolve(p.entry))
