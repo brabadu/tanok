@@ -5,7 +5,7 @@ export function actionIs(actionName) {
 }
 
 export function parentIs(awaitedName) {
-  console.warning('This function is deprecated, use `nameIs` instead')
+  console.error('This function is deprecated, use `nameIs` instead')
   return function () {
     return this.filter(({streamName}) => streamName === awaitedName);
   };
@@ -33,16 +33,4 @@ export function throttle(time) {
   return function () {
     return this.throttle(time);
   };
-}
-
-export function rethrowFx(action, payload, metadata) {
-  return function (stream) {
-    stream.send(action, payload, metadata)
-  }
-}
-
-export function subcomponentFx(subName, dispatchSub) {
-  return function (stream) {
-    stream.subStream(subName, dispatchSub)
-  }
 }
