@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+* Create less files in rollup build, as most of them are never used as separate things
+* Renamed `effectWrapper` to `childFx`
+* Grouped all built-in effects in `fxs.js`
+* Moved `TanokDispatcher` base class out of `core.js` module
+
+
 ## 1.0
 
 ### Breaking
