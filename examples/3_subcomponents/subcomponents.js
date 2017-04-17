@@ -1,5 +1,5 @@
 import React from 'react';
-import {on, TanokDispatcher, effectWrapper, subcomponentFx, tanokComponent} from '../../lib/tanok.js';
+import {on, TanokDispatcher, childFx, subcomponentFx, tanokComponent} from '../../lib/tanok.js';
 
 import {init as counterInit,
         CounterDispatcher, Counter} from '../2_effects/counter-effects.js';
@@ -25,14 +25,14 @@ export class Dashboard extends TanokDispatcher {
   top(payload, state) {
     const [newState, ...effects] = payload(state.top);
     state.top = newState;
-    return [state, ...effects.map((e) => effectWrapper(e, 'top'))]
+    return [state, ...effects.map((e) => childFx(e, 'top'))]
   }
 
   @on('bottom')
   bottom(payload, state) {
     const [newState, ...effects] = payload(state.bottom);
     state.bottom = newState;
-    return [state, ...effects.map((e) => effectWrapper(e, 'bottom'))]
+    return [state, ...effects.map((e) => childFx(e, 'bottom'))]
   }
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import {on, TanokDispatcher, effectWrapper, subcomponentFx, rethrowFx, tanokComponent} from '../../lib/tanok.js';
+import {on, TanokDispatcher, childFx, subcomponentFx, rethrowFx, tanokComponent} from '../../lib/tanok.js';
 
 import {init as initColumn,
         Dashboard as ColumnDispatcher, CountersCollection as ColumnView} from './subcomponents.js';
@@ -27,7 +27,7 @@ export class Dashboard extends TanokDispatcher {
   columnChange(payload, state, {metadata}) {
     const [newState, ...effects] = payload(state[metadata]);
     state[metadata] = newState;
-    return [state, ...effects.map((e) => effectWrapper(e, COLUMN, metadata))]
+    return [state, ...effects.map((e) => childFx(e, COLUMN, metadata))]
   }
 }
 
