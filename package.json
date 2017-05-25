@@ -31,6 +31,7 @@
   ],
   "license": "MIT",
   "peerDependencies": {
+    "prop-types": "*",
     "react": "*",
     "react-dom": "*",
     "rx": "^4.0.6"
@@ -46,6 +47,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
     "mocha": "^2.5.3",
+    "prop-types": "^15.5.10",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "rollup": "^0.41.6",
