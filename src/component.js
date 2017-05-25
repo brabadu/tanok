@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { StreamWrapper } from './streamWrapper.js';
 
@@ -16,8 +17,8 @@ import { StreamWrapper } from './streamWrapper.js';
  * */
 export function tanokComponent(target) {
   target.propTypes = target.propTypes || {};
-  target.propTypes.eventStream = React.PropTypes.instanceOf(StreamWrapper);
-  target.propTypes.tanokStream = React.PropTypes.instanceOf(StreamWrapper);
+  target.propTypes.eventStream = PropTypes.instanceOf(StreamWrapper);
+  target.propTypes.tanokStream = PropTypes.instanceOf(StreamWrapper);
 
   target.displayName = `TanokComponent(${target.displayName || target.name})`;
 
@@ -52,7 +53,7 @@ export function tanokComponent(target) {
       return stream && stream.subWithMeta(name, metadata);
     }
     return stream && stream.subs[name];
-  }
+  };
 
   return target;
 }
