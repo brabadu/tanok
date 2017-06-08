@@ -56,6 +56,14 @@ export function tanok(initialState, update, view, options) {
   const streamWrapper = new StreamWrapper(eventStream, rootName);
   streamWrapper.metadata.push(null);
 
+  const effectsBus = new Rx.Subject();
+  effectsBus
+    .flatMap((obj) => obj(streamWrapper, effectsBus) || [])
+    .subscribe(
+      Rx.helpers.noop,
+      console.error.bind(console)
+    );
+
   let component;
   const composedMiddlewares = compose.apply(undefined, middlewares);
 
@@ -71,14 +79,7 @@ export function tanok(initialState, update, view, options) {
   streamWrapper.disposable = dispatcher
     .do(({state}) => component && component.setState(stateSerializer(state)))
     .do(({effects=[]}) =>
-      effects.forEach((e) =>
-        Rx.Observable.spawn(e(streamWrapper))
-        .flatMap((obs) => obs || [])
-        .subscribe(
-          Rx.helpers.noop,
-          console.error.bind(console)
-        )
-      )
+      effects.forEach((e) => effectsBus.onNext(e))
     )
     .subscribe(
       Rx.helpers.noop,
