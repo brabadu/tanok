@@ -111,6 +111,11 @@ export function tanok(initialState, update, view, options) {
 
   return {
     disposable: streamWrapper.disposable,
+    streamWrapper: streamWrapper,
+    shutdown: () => {
+        streamWrapper.disposable.dispose();
+        ReactDOM.unmountComponentAtNode(container);
+    },
     eventStream,
     component,
   };
