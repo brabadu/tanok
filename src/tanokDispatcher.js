@@ -1,7 +1,12 @@
 export const TanokDispatcher = function() {};
 
 TanokDispatcher.prototype.collect = function () {
-  return this.events.map((args) => [args[0], args[1].bind(this)]);
+  return Object.keys(this.events).map(
+    (handlerFuncName) => {
+        const pair = this.events[handlerFuncName];
+        return [pair[0], pair[1].bind(this)];
+    }
+  );
 }
 
 TanokDispatcher.prototype[Symbol.iterator] = function(){
@@ -39,7 +44,8 @@ TanokDispatcher.prototype[Symbol.iterator] = function(){
  */
 export function on(...predicate) {
   return (target, property) => {
-    target.events = target.events || [];
-    target.events.push([predicate, target[property]]);
+    target.events = target.events || {};
+    const handlerFunc = target[property];
+    target.events[handlerFunc.name] = [predicate, handlerFunc];
   };
 }
