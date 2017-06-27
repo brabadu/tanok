@@ -21,6 +21,38 @@ const Root = createReactClass({
 });
 
 
+export function makeStreamState(initialState, update, eventStream, middlewares) {
+  let dispatcher = dispatch(eventStream, update, null);
+
+  const composedMiddlewares = compose.apply(undefined, middlewares);
+
+  return dispatcher
+    .scan((({state}, action) => {
+      const appliedMiddleware = composedMiddlewares(action);
+      const {state: newState, effects, params} = appliedMiddleware(state);
+      return {state: newState, effects, params};
+    }), {state: initialState})
+    .startWith({state: initialState});
+}
+
+
+export function streamWithEffects(stream, streamWrapper) {
+  const effectsBus = new Rx.Subject();
+  const effectsDisposable = effectsBus
+    .flatMap((obj) => obj(streamWrapper, effectsBus) || [])
+    .subscribe(
+      Rx.helpers.noop,
+      console.error.bind(console)
+    );
+
+    return [
+      effectsDisposable,
+      stream.do(({effects=[]}) =>
+        effects.forEach((e) => effectsBus.onNext(e))
+      )
+    ];
+}
+
 /**
  * @typedef TanokReturnValue
  * @type { Object }
@@ -51,40 +83,21 @@ export function tanok(initialState, update, view, options) {
   }
 
   const eventStream = new Rx.Subject();
-  const rootName = null;
-  let dispatcher = dispatch(eventStream, update, rootName);
-  const streamWrapper = new StreamWrapper(eventStream, rootName);
+  const streamWrapper = new StreamWrapper(eventStream, null);
   streamWrapper.metadata.push(null);
 
-  const effectsBus = new Rx.Subject();
-  effectsBus
-    .flatMap((obj) => obj(streamWrapper, effectsBus) || [])
-    .subscribe(
-      Rx.helpers.noop,
-      console.error.bind(console)
-    );
+  const streamState = makeStreamState(initialState, update, eventStream, middlewares);
 
   let component;
-  const composedMiddlewares = compose.apply(undefined, middlewares);
+  const renderedStream = streamState.do(
+    ({state}) => component && component.setState(stateSerializer(state))
+  );
+  const [fxDisposable, renderedWithEffects] = streamWithEffects(renderedStream, streamWrapper);
 
-  dispatcher = dispatcher
-    .scan((({state}, action) => {
-      const appliedMiddleware = composedMiddlewares(action);
-      const {state: newState, effects, params: params} = appliedMiddleware(state);
-      return {state: newState, effects, params: params}
-    }), {state: initialState})
-    .startWith({state: initialState});
-
-
-  streamWrapper.disposable = dispatcher
-    .do(({state}) => component && component.setState(stateSerializer(state)))
-    .do(({effects=[]}) =>
-      effects.forEach((e) => effectsBus.onNext(e))
-    )
-    .subscribe(
-      Rx.helpers.noop,
-      console.error.bind(console)
-    );
+  streamWrapper.disposable = renderedWithEffects.subscribe(
+    Rx.helpers.noop,
+    console.error.bind(console)
+  );
 
   streamWrapper.send('init');
 
@@ -111,9 +124,10 @@ export function tanok(initialState, update, view, options) {
 
   return {
     disposable: streamWrapper.disposable,
-    streamWrapper: streamWrapper,
+    streamWrapper,
     shutdown: () => {
         streamWrapper.disposable.dispose();
+        fxDisposable.dispose();
         ReactDOM.unmountComponentAtNode(container);
     },
     eventStream,
