@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0
+
+* All effects are passed through one effects bus, this allows effect cancelation
+* Fixed `TanokDispatcher` inheritance bug, which caused multiple call of `init`
+* `tanok` function now also returns `streamWrapper` and `shutdown` function, that allows graceful shutdown of your tanok instance
+* Extracted `makeStreamState` and `streamWithEffects` out of `tanok` function.
+* Dropped `create-react-class` package in favor of React.Component class-based Root
+* Using `es2015-loose` preset for building tanok
+
+
 ## 1.1.0
 
 * Create less files in rollup build, as most of them are never used as separate things
