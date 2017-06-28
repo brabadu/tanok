@@ -1,16 +1,16 @@
 import Rx from 'rx';
 import React from 'react';
-import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import compose from './compose';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
 
 const identity = (value) => value;
 
-const Root = createReactClass({
-  getInitialState() {
-    return this.props;
-  },
+class Root extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = props;
+  }
 
   render() {
     return React.createElement(
@@ -18,8 +18,7 @@ const Root = createReactClass({
       this.state
     )
   }
-});
-
+}
 
 export function makeStreamState(initialState, update, eventStream, middlewares) {
   let dispatcher = dispatch(eventStream, update, null);

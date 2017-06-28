@@ -16,11 +16,13 @@ const entries = [
     moduleName: 'tanokStreamWrapper',
   },
 ]
-const external = entries.map((p) => path.resolve(p.entry))
 const plugins = [
   babel({
     "presets": [ "es2015-rollup", "stage-0", "react" ],
-    "plugins": [ "transform-decorators-legacy", "transform-object-rest-spread" ],
+    "plugins": [ "transform-decorators-legacy",
+                 ["transform-es2015-classes", {loose: true}],
+                "transform-object-rest-spread"
+              ],
     "babelrc": false
   }),
   nodeResolve({
@@ -34,8 +36,13 @@ const plugins = [
 entries.forEach((entry) => {
   rollup.rollup({
     entry: entry.entry,
-    external: external,
     plugins: plugins,
+    external: ['rx', 'react', 'prop-types', 'react-dom'],
+    globals: {
+      rx: 'Rx',
+      react: 'React',
+      'react-dom': 'ReactDOM',
+    },
   })
   .then(
       (bundle) => bundle.write({
