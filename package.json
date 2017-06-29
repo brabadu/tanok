@@ -1,6 +1,6 @@
 {
   "name": "tanok",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Lightweight pattern for React+Rx.js front-end applications. Written under heavy impression of Elm Architecture",
   "main": "lib/tanok.js",
   "scripts": {
@@ -27,7 +27,8 @@
   "contributors": [
     "Dmitry Sadkovoy",
     "Valeriy Morkovyn",
-    "Anton Verinov <anton@verinov.com>"
+    "Anton Verinov <anton@verinov.com>",
+    "Dmitry Zhuribeda"
   ],
   "license": "MIT",
   "peerDependencies": {
@@ -60,7 +61,8 @@
     "rx": "^4.0.6"
   },
   "dependencies": {
-    "babel-runtime": "^6.9.2"
+    "babel-runtime": "^6.9.2",
+    "webpack": "^1.15.0"
   },
   "false": {}
 }
