@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import compose from './compose';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
 
-const identity = (value) => value;
+export const identity = (value) => value;
 
 class Root extends React.Component {
   constructor(props) {
@@ -115,7 +115,7 @@ export function tanok(initialState, update, view, options) {
   )
 
   if (outerEventStream) {
-    outerEventStream.subscribe(
+    const outerEventDisposable = outerEventStream.subscribe(
       streamWrapper.stream.onNext.bind(streamWrapper.stream),
       console.error.bind(console)
     )
@@ -127,6 +127,7 @@ export function tanok(initialState, update, view, options) {
     shutdown: () => {
         streamWrapper.disposable.dispose();
         fxDisposable.dispose();
+        outerEventDisposable && outerEventDisposable.dispose();
         ReactDOM.unmountComponentAtNode(container);
     },
     eventStream,
