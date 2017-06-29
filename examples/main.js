@@ -1,4 +1,4 @@
-import {tanok} from '../lib/tanok.js';
+import {tanok, TanokInReact} from '../lib/tanok.js';
 
 import {
   init as init_1,
@@ -59,3 +59,36 @@ tanok(init_1(), (new CounterDispatcher1), Counter1, {
   container: document.getElementById('outer-event-stream'),
   outerEventStream: ticks
 });
+
+
+// Tanok In React example
+import ReactDOM from 'react-dom';
+import React from 'react';
+
+
+const update = new Dashboard2;
+class ReactWithTanokInside extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { key : 0, open: true }
+  }
+  render() {
+    return <div>
+      <h1>I'm simple component with tanok inside</h1>
+      <button onClick={() => this.setState({key: this.state.key + 1})}>
+        Remount
+      </button>
+      <button onClick={() => this.setState({open: !this.state.open})}>
+        Toggle
+      </button>
+      {this.state.open ? <TanokInReact
+        key={this.state.key}
+        initialState={init_4() /* we have to call func here to get new state on every remont */} 
+        update={update}
+        view={TwoColumns}
+      /> : null }
+    </div>
+  }
+}
+
+ReactDOM.render(<ReactWithTanokInside />, document.getElementById('tanok-in-react'));

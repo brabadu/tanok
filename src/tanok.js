@@ -3,6 +3,7 @@ export * from './core';
 export * from './fxs';
 export * from './helpers';
 export * from './tanokDispatcher';
+export * from './tanokInReact';
 
 import { childFx } from './fxs';
 

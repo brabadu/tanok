@@ -6,6 +6,7 @@
 * Fixed `TanokDispatcher` inheritance bug, which caused multiple call of `init`
 * `tanok` function now also returns `streamWrapper` and `shutdown` function, that allows graceful shutdown of your tanok instance
 * Extracted `makeStreamState` and `streamWithEffects` out of `tanok` function.
+* Added new React HOC `TanokInReact` which allows to run complete tanok app inside simple React component
 * Dropped `create-react-class` package in favor of React.Component class-based Root
 * Using `es2015-loose` preset for building tanok
 
