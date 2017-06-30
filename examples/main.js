@@ -83,7 +83,7 @@ class ReactWithTanokInside extends React.Component {
       </button>
       {this.state.open ? <TanokInReact
         key={this.state.key}
-        initialState={init_4() /* we have to call func here to get new state on every remont */} 
+        initialState={init_4() /* we have to call func here to get new state on every remount */}
         update={update}
         view={TwoColumns}
       /> : null }
@@ -92,3 +92,9 @@ class ReactWithTanokInside extends React.Component {
 }
 
 ReactDOM.render(<ReactWithTanokInside />, document.getElementById('tanok-in-react'));
+
+import { SearchModel, SearchDispatcher, SearchComponent } from './SearchExample';
+
+tanok(new SearchModel(), new SearchDispatcher, SearchComponent, {
+  container: document.getElementById('search-example')
+});
