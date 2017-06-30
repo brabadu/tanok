@@ -40332,12 +40332,7 @@
 	        }).subscribe(function (_ref2) {
 	            var items = _ref2.items;
 
-	            console.log('NEEEXT');
 	            stream.send(action.SEARCH_OK, { items: items });
-	        }, function (error) {
-	            console.error('ERROR', error);
-	        }, function () {
-	            return console.log('Complete');
 	        });
 	    };
 	}

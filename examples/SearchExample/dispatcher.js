@@ -13,13 +13,8 @@ function searchRepos(searchTerm) {
         .do(() => console.log('post', searchTerm))
         .subscribe(
             function ({ items }) {
-                console.log('NEEEXT')
                 stream.send(action.SEARCH_OK, { items });
-            },
-            function (error) {
-                console.error('ERROR', error)
-            },
-            () => console.log('Complete')
+            }
         );
     }
 }
