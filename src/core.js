@@ -31,25 +31,19 @@ export function makeStreamState(initialState, update, eventStream, middlewares) 
       const {state: newState, effects, params} = appliedMiddleware(state);
       return {state: newState, effects, params};
     }), {state: initialState})
-    .startWith({state: initialState});
+    .startWith({state: initialState, effects: []});
 }
 
 
 export function streamWithEffects(stream, streamWrapper) {
-  const effectsBus = new Rx.Subject();
-  const effectsDisposable = effectsBus
-    .flatMap((obj) => obj(streamWrapper, effectsBus) || [])
-    .subscribe(
-      Rx.helpers.noop,
-      console.error.bind(console)
-    );
-
-    return [
-      effectsDisposable,
-      stream.do(({effects=[]}) =>
-        effects.forEach((e) => effectsBus.onNext(e))
+    return stream.do(({effects}) =>
+        effects.forEach((e) => Rx.Observable.spawn(e(streamWrapper))
+        .flatMap((obs) => obs || [])
+        .subscribe(
+          Rx.helpers.noop,
+          console.error.bind(console)
+        ))
       )
-    ];
 }
 
 /**
@@ -91,7 +85,7 @@ export function tanok(initialState, update, view, options) {
   const renderedStream = streamState.do(
     ({state}) => component && component.setState(stateSerializer(state))
   );
-  const [fxDisposable, renderedWithEffects] = streamWithEffects(renderedStream, streamWrapper);
+  const renderedWithEffects = streamWithEffects(renderedStream, streamWrapper);
 
   streamWrapper.disposable = renderedWithEffects.subscribe(
     Rx.helpers.noop,
@@ -126,7 +120,6 @@ export function tanok(initialState, update, view, options) {
     streamWrapper,
     shutdown: () => {
         streamWrapper.disposable.dispose();
-        fxDisposable.dispose();
         outerEventDisposable && outerEventDisposable.dispose();
         ReactDOM.unmountComponentAtNode(container);
     },

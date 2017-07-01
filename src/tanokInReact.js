@@ -31,7 +31,7 @@ export class TanokInReact extends React.Component {
         onNewState && onNewState(state);
       }
     );
-    const [fxDisposable, renderedWithEffects] = streamWithEffects(renderedStream, streamWrapper);
+    const renderedWithEffects = streamWithEffects(renderedStream, streamWrapper);
 
     streamWrapper.disposable = renderedWithEffects.subscribe(
       Rx.helpers.noop,
@@ -42,7 +42,6 @@ export class TanokInReact extends React.Component {
       view: view,
       shutdown: () => {
           streamWrapper.disposable.dispose();
-          fxDisposable.dispose();
       },
 
       tanokStream: streamWrapper,
