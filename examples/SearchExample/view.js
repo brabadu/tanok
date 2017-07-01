@@ -14,7 +14,10 @@ export class SearchComponent extends React.Component {
                     }}
                 />
                 <ul>
-                    {this.props.repos.map((repo) => <li>{repo.name} {repo.stargazers_count} stars</li>)}
+                    {this.props.repos
+                      ? this.props.repos.map((repo) => <li key={repo.name}>{repo.name} {repo.stargazers_count} stars</li>)
+                      : 'Failed to load anything'
+                    }
                 </ul>
             </div>
         )

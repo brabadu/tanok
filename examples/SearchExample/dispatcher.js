@@ -4,18 +4,14 @@ import * as action from './actions';
 
 function searchRepos(searchTerm) {
     return (stream) => {
-        Rx.Observable.fromPromise(() =>
-                fetch(`https://api.github.com/search/repositories?q=${searchTerm || 'tanok'}`)
-                    .then((r) => r.json())
+        Rx.Observable.fromPromise(
+          fetch(`https://api.github.com/search/repositories?q=${searchTerm || 'tanok'}`)
         )
+        .flatMap((r) => r.json())
         .do(() => console.log('pre', searchTerm))
         .takeUntil(stream.stream.filter(({action: dispatchedAction}) => dispatchedAction === action.CANCEL_SEARCH))
         .do(() => console.log('post', searchTerm))
-        .subscribe(
-            function ({ items }) {
-                stream.send(action.SEARCH_OK, { items });
-            }
-        );
+        .do(({ items }) => stream.send(action.SEARCH_OK, { items }))
     }
 }
 
