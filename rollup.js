@@ -18,8 +18,8 @@ const entries = [
 ]
 const plugins = [
   babel({
-    "presets": [ "es2015-rollup", "stage-0", "react" ],
-    "plugins": [ "transform-decorators-legacy",
+    "presets": [ ["es2015", { "modules": false }], "stage-0", "react" ],
+    "plugins": [ "external-helpers", "transform-decorators-legacy",
                  ["transform-es2015-classes", {loose: true}],
                 "transform-object-rest-spread"
               ],

@@ -59,5 +59,5 @@ export class Counter extends React.Component {
         <button onClick={this.onPlusClick}>+</button>
       </div>
     )
-    }
+  }
 }

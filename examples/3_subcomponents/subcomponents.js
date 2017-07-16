@@ -1,5 +1,5 @@
 import React from 'react';
-import {on, TanokDispatcher, childFx, subcomponentFx, tanokComponent} from '../../lib/tanok.js';
+import {on, TanokDispatcher, childFx, subcomponentFx, tanokComponent, SubComponent} from '../../lib/tanok.js';
 
 import {init as counterInit,
         CounterDispatcher, Counter} from '../2_effects/counter-effects.js';
@@ -40,8 +40,12 @@ export class Dashboard extends TanokDispatcher {
 export class TwoCounters extends React.Component {
   render() {
         return <div>
-          <Counter {...this.props.top} tanokStream={this.sub('top')} />
-          <Counter {...this.props.bottom} tanokStream={this.sub('bottom')} />
+          <SubComponent name='top'>
+            <Counter {...this.props.top} />
+          </SubComponent>
+          <SubComponent name='bottom'>
+            <Counter {...this.props.bottom} />
+          </SubComponent>
         </div>
     }
 }
