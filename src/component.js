@@ -33,14 +33,14 @@ export function tanokComponent(target) {
       console.error('Hey! You no longer can pass metadata `.send()`, use `.sub()`');
     }
 
-    const stream = this.context.tanokStream || this.props.tanokStream || this.props.eventStream;
+    const stream = this.props.tanokStream || this.context.tanokStream || this.props.eventStream;
     stream.send(action, payload);
   };
 
   target.prototype.subStream = function subStream(name, updateHandlers) {
     console.error(`stream.subStream function is deprecated. Use subcomponentFx effect (${target.displayName})`);
 
-    const stream = this.context.tanokStream || this.props.tanokStream || this.props.eventStream;
+    const stream = this.props.tanokStream || this.context.tanokStream || this.props.eventStream;
     return stream.subStream(name, updateHandlers);
   };
 
@@ -49,7 +49,7 @@ export function tanokComponent(target) {
       console.error(`Use 'tanokStream' argument instead of 'eventStream' (${target.displayName})`);
     }
 
-    const stream = this.context.tanokStream || this.props.tanokStream || this.props.eventStream;
+    const stream = this.props.tanokStream || this.context.tanokStream || this.props.eventStream;
 
     if (metadata !== null) {
       return stream && stream.subWithMeta(name, metadata);
