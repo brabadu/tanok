@@ -46,6 +46,6 @@ export function on(...predicate) {
   return (target, property) => {
     target.events = target.events || {};
     const handlerFunc = target[property];
-    target.events[handlerFunc.name] = [predicate, handlerFunc];
+    target.events[property] = [predicate, handlerFunc];
   };
 }
