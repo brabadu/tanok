@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+* Removed `effectBus` as it is actually not needed
+* Fixed name collision in `on` decorator
+
 ## 1.2.0
 
 * All effects are passed through one effects bus, this allows effect cancelation
