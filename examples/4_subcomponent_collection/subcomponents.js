@@ -1,5 +1,5 @@
 import React from 'react';
-import {on, TanokDispatcher, childFx, subcomponentFx, rethrowFx, tanokComponent} from '../../lib/tanok.js';
+import {on, TanokDispatcher, childFx, subcomponentFx, rethrowFx, tanokComponent, SubComponent} from '../../lib/tanok.js';
 
 import {init as counterInit,
         CounterDispatcher, Counter} from './counter-collection.js';
@@ -34,7 +34,15 @@ export class CountersCollection extends React.Component {
   render() {
       return <div>
         {this.props.counters.map((counter) =>
-          <Counter key={counter.id} tanokStream={this.sub(COUNTERS_CHANGE, counter.id)} {...counter} />
+          <SubComponent
+            key={counter.id}
+            name={COUNTERS_CHANGE}
+            metadata={counter.id}
+          >
+            <Counter
+              {...counter}
+            />
+          </SubComponent>
         )}
       </div>
   }

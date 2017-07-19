@@ -46,10 +46,10 @@ export class Counter extends React.Component {
     this.onMinusClick = this.onMinusClick.bind(this);
   }
   onPlusClick() {
-    this.send('inc')
+    this.props.send('inc')
   }
   onMinusClick() {
-    this.send('dec')
+    this.props.send('dec')
   }
   render() {
     return (

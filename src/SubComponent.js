@@ -32,3 +32,10 @@ SubComponent.childContextTypes = {
 SubComponent.contextTypes = {
   tanokStream: PropTypes.instanceOf(StreamWrapper).isRequired,
 };
+SubComponent.defaultProps = {
+  metadata: null,
+};
+SubComponent.propTypes = {
+  name: PropTypes.any.isRequired,
+  metadata: PropTypes.any,
+};

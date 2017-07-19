@@ -110,7 +110,6 @@ export function tanok(initialState, update, view, options) {
       Object.assign({
           view,
           tanokStream: streamWrapper,
-          eventStream: streamWrapper,
         },
         stateSerializer(initialState)
       )

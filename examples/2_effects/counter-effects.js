@@ -100,13 +100,13 @@ export class Counter extends React.Component {
     this.onEffectsClick = this.onEffectsClick.bind(this);
   }
   onPlusClick() {
-    this.send('inc')
+    this.props.send('inc')
   }
   onMinusClick() {
-    this.send('dec')
+    this.props.send('dec')
   }
   onEffectsClick() {
-    this.send('effectKinds')
+    this.props.send('effectKinds')
   }
   render() {
     return (
