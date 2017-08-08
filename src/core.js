@@ -36,9 +36,10 @@ export function makeStreamState(initialState, update, eventStream, middlewares) 
 
 
 export function streamWithEffects(stream, streamWrapper) {
+    const { Observable, helpers: { isPromise } } = Rx;
     return stream.do(({effects}) =>
-        effects.forEach((e) => Rx.Observable.spawn(e(streamWrapper))
-        .flatMap((obs) => obs || [])
+        effects.forEach((e) => Observable.spawn(e(streamWrapper))
+        .flatMap((obs) => obs instanceof Observable || isPromise(obs) ? obs : [])
         .subscribe(
           Rx.helpers.noop,
           console.error.bind(console)

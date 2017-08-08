@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.2
+* Check for return value of effect, `flatMap` it only if it's Promise or Observable.
+
 ## 1.2.1
 * Removed `effectBus` as it is actually not needed
 * Fixed name collision in `on` decorator
