@@ -1,5 +1,5 @@
 import React from 'react';
-import {on, TanokDispatcher, childFx, subcomponentFx, rethrowFx, tanokComponent} from '../../lib/tanok.js';
+import {on, TanokDispatcher, childFx, subcomponentFx, rethrowFx, tanokComponent, SubComponent} from '../../lib/tanok.js';
 
 import {init as initColumn,
         Dashboard as ColumnDispatcher, CountersCollection as ColumnView} from './subcomponents.js';
@@ -39,10 +39,20 @@ export class TwoColumns extends React.Component {
         <tbody>
         <tr>
           <td>
-            <ColumnView key={LEFT} tanokStream={this.sub(COLUMN, LEFT)} {...this.props[LEFT]} />
+            <SubComponent
+              name={COLUMN}
+              metadata={LEFT}
+            >
+              <ColumnView key={LEFT} {...this.props[LEFT]} />
+            </SubComponent>
           </td>
           <td>
-            <ColumnView key={RIGHT} tanokStream={this.sub(COLUMN, RIGHT)} {...this.props[RIGHT]} />
+            <SubComponent
+              name={COLUMN}
+              metadata={RIGHT}
+            >
+              <ColumnView key={RIGHT} {...this.props[RIGHT]} />
+            </SubComponent>
           </td>
         </tr>
         </tbody>

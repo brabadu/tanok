@@ -1,5 +1,6 @@
 import Rx from 'rx';
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import compose from './compose';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
@@ -10,6 +11,11 @@ class Root extends React.Component {
   constructor(props) {
     super(props);
     this.state = props;
+    this.tanokStream = props.tanokStream;
+  }
+
+  getChildContext() {
+    return { tanokStream: this.tanokStream }
   }
 
   render() {
@@ -19,6 +25,10 @@ class Root extends React.Component {
     )
   }
 }
+
+Root.childContextTypes = {
+  tanokStream: PropTypes.instanceOf(StreamWrapper).isRequired,
+};
 
 export function makeStreamState(initialState, update, eventStream, middlewares) {
   let dispatcher = dispatch(eventStream, update, null);
@@ -101,7 +111,6 @@ export function tanok(initialState, update, view, options) {
       Object.assign({
           view,
           tanokStream: streamWrapper,
-          eventStream: streamWrapper,
         },
         stateSerializer(initialState)
       )

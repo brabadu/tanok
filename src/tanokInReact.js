@@ -1,4 +1,5 @@
 import Rx from 'rx';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { StreamWrapper } from './streamWrapper.js';
@@ -27,7 +28,7 @@ export class TanokInReact extends React.Component {
 
     const renderedStream = streamState.do(
       ({state}) => {
-        this._mounted && this.setState({state});
+        this._mounted && this.setState({ state: stateSerializer(state) });
         onNewState && onNewState(state);
       }
     );
@@ -51,6 +52,10 @@ export class TanokInReact extends React.Component {
     streamWrapper.send('init');
   }
 
+  getChildContext() {
+    return { tanokStream: this.state.tanokStream }
+  }
+
   componentDidMount() {
     this._mounted = true;
   }
@@ -69,3 +74,7 @@ export class TanokInReact extends React.Component {
     )
   }
 }
+
+TanokInReact.childContextTypes = {
+  tanokStream: PropTypes.instanceOf(StreamWrapper).isRequired,
+};

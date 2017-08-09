@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { StreamWrapper } from './streamWrapper.js';
@@ -15,45 +15,32 @@ import { StreamWrapper } from './streamWrapper.js';
  * }
  *
  * */
-export function tanokComponent(target) {
-  target.propTypes = target.propTypes || {};
-  target.propTypes.eventStream = PropTypes.instanceOf(StreamWrapper);
-  target.propTypes.tanokStream = PropTypes.instanceOf(StreamWrapper);
-
-  target.displayName = `TanokComponent(${target.displayName || target.name})`;
-
-  target.prototype.send = function send(action, payload, metadata = null) {
-    if (!this.props.tanokStream && this.props.eventStream) {
-      console.error(`Use 'tanokStream' argument instead of 'eventStream' (${target.displayName})`);
+export function tanokComponent(WrappedComponent) {
+  class TanokComponent extends Component {
+    constructor(props, context) {
+      super(props, context);
+      this.send = this.send.bind(this);
     }
 
-    if (metadata !== null) {
-      console.error('Hey! You no longer can pass metadata `.send()`, use `.sub()`');
+    send(action, payload) {
+      this.context.tanokStream.send(action, payload);
     }
 
-    const stream = this.props.tanokStream || this.props.eventStream;
-    stream.send(action, payload);
+    render() {
+      return (
+        <WrappedComponent
+          {...this.props}
+          send={this.send}
+        />
+      );
+    }
+  }
+  WrappedComponent.propTypes = WrappedComponent.propTypes || {};
+  WrappedComponent.propTypes.send = PropTypes.func.isRequired;
+  TanokComponent.displayName = `TanokComponent(${WrappedComponent.displayName || WrappedComponent.name})`;
+  TanokComponent.contextTypes = {
+    tanokStream: PropTypes.instanceOf(StreamWrapper),
   };
 
-  target.prototype.subStream = function subStream(name, updateHandlers) {
-    console.error(`stream.subStream function is deprecated. Use subcomponentFx effect (${target.displayName})`);
-
-    const stream = this.props.tanokStream || this.props.eventStream;
-    return stream.subStream(name, updateHandlers);
-  };
-
-  target.prototype.sub = function sub(name, metadata = null) {
-    if (!this.props.tanokStream && this.props.eventStream) {
-      console.error(`Use 'tanokStream' argument instead of 'eventStream' (${target.displayName})`);
-    }
-
-    const stream = this.props.tanokStream || this.props.eventStream;
-
-    if (metadata !== null) {
-      return stream && stream.subWithMeta(name, metadata);
-    }
-    return stream && stream.subs[name];
-  };
-
-  return target;
+  return TanokComponent;
 }

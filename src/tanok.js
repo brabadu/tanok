@@ -4,6 +4,7 @@ export * from './fxs';
 export * from './helpers';
 export * from './tanokDispatcher';
 export * from './tanokInReact';
+export * from './SubComponent';
 
 import { childFx } from './fxs';
 

@@ -11,7 +11,11 @@ function searchRepos(searchTerm) {
         .do(() => console.log('pre', searchTerm))
         .takeUntil(stream.stream.filter(({action: dispatchedAction}) => dispatchedAction === action.CANCEL_SEARCH))
         .do(() => console.log('post', searchTerm))
-        .do(({ items }) => stream.send(action.SEARCH_OK, { items }))
+        .subscribe(
+            function ({ items }) {
+                stream.send(action.SEARCH_OK, { items });
+            }
+        );
     }
 }
 
