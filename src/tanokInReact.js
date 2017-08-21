@@ -20,7 +20,7 @@ export class TanokInReact extends React.Component {
     streamWrapper.metadata.push(null);
 
     const streamState = makeStreamState(
-      Object.assign({}, initialState),
+      initialState,
       update,
       eventStream,
       middlewares
