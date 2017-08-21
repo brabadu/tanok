@@ -11,7 +11,7 @@ export class TanokInReact extends React.Component {
     const {
        initialState, update, view,
        stateSerializer = identity, middlewares = [],
-       onNewState
+       onNewState, outerEventStream
     } = props;
 
     const eventStream = new Rx.Subject();
@@ -37,11 +37,20 @@ export class TanokInReact extends React.Component {
       Rx.helpers.noop,
       console.error.bind(console)
     );
+    let outerEventDisposable;
+    if (outerEventStream) {
+      outerEventDisposable = outerEventStream.subscribe(
+        streamWrapper.stream.onNext.bind(streamWrapper.stream),
+        console.error.bind(console)
+      );
+    }
+
 
     this.state = {
       view: view,
       shutdown: () => {
-          streamWrapper.disposable.dispose();
+        streamWrapper.disposable.dispose();
+        outerEventDisposable && outerEventDisposable.dispose();
       },
 
       tanokStream: streamWrapper,
@@ -63,7 +72,10 @@ export class TanokInReact extends React.Component {
     const state = this.state;
     return React.createElement(
       state.view,
-      Object.assign(state.state, {
+      Object.assign(
+        this.props.stateSerializer
+          ? this.props.stateSerializer(state.state)
+          : state.state, {
           tanokStream: state.tanokStream
       }),
     )
