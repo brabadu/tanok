@@ -46,15 +46,15 @@ export class TanokInReact extends React.Component {
       );
     }
 
+    this.shutdown = () => {
+      streamWrapper.disposable.dispose();
+      outerEventDisposable && outerEventDisposable.dispose();
+    };
+
+    this.view = view;
+    this.tanokStream = streamWrapper;
 
     this.state = {
-      view: view,
-      shutdown: () => {
-        streamWrapper.disposable.dispose();
-        outerEventDisposable && outerEventDisposable.dispose();
-      },
-
-      tanokStream: streamWrapper,
       state: initialState,
     };
 
@@ -66,16 +66,16 @@ export class TanokInReact extends React.Component {
   }
 
   componentWillUnmount() {
-    this.state.shutdown();
+    this.shutdown();
   }
 
   render() {
     const state = this.state;
     return React.createElement(
-      state.view,
+      this.view,
       Object.assign(
         this.stateSerializer(state.state), {
-          tanokStream: state.tanokStream
+          tanokStream: this.tanokStream
       }),
     )
   }
