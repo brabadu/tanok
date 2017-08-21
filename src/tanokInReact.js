@@ -13,6 +13,7 @@ export class TanokInReact extends React.Component {
        stateSerializer = identity, middlewares = [],
        onNewState, outerEventStream
     } = props;
+    this.stateSerializer = stateSerializer;
 
     const eventStream = new Rx.Subject();
     const streamWrapper = new StreamWrapper(eventStream, null);
@@ -73,9 +74,7 @@ export class TanokInReact extends React.Component {
     return React.createElement(
       state.view,
       Object.assign(
-        this.props.stateSerializer
-          ? this.props.stateSerializer(state.state)
-          : state.state, {
+        this.stateSerializer(state.state), {
           tanokStream: state.tanokStream
       }),
     )
