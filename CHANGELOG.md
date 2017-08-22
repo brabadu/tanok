@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.3
+* Fixed corrupting initial state type in TanokInReact
+
 ## 1.2.2
 * Check for return value of effect, `flatMap` it only if it's Promise or Observable.
 * Fixes to `TanokInReact` HOC
