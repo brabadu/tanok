@@ -2,6 +2,7 @@ import Rx from 'rx';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import compose from './compose';
+import { INIT } from './coreActions';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
 
 export const identity = (value) => value;
@@ -93,7 +94,7 @@ export function tanok(initialState, update, view, options) {
     console.error.bind(console)
   );
 
-  streamWrapper.send('init');
+  streamWrapper.send(INIT);
 
   component = ReactDOM.render(
     React.createElement(
@@ -108,9 +109,9 @@ export function tanok(initialState, update, view, options) {
     ),
     container
   )
-
+  let outerEventDisposable;
   if (outerEventStream) {
-    const outerEventDisposable = outerEventStream.subscribe(
+    outerEventDisposable = outerEventStream.subscribe(
       streamWrapper.stream.onNext.bind(streamWrapper.stream),
       console.error.bind(console)
     )
@@ -120,9 +121,10 @@ export function tanok(initialState, update, view, options) {
     disposable: streamWrapper.disposable,
     streamWrapper,
     shutdown: () => {
-        streamWrapper.disposable.dispose();
-        outerEventDisposable && outerEventDisposable.dispose();
-        ReactDOM.unmountComponentAtNode(container);
+      streamWrapper.onShutdown();
+      streamWrapper.disposable.dispose();
+      outerEventDisposable && outerEventDisposable.dispose();
+      ReactDOM.unmountComponentAtNode(container);
     },
     eventStream,
     component,

@@ -1,4 +1,5 @@
 import Rx from 'rx';
+import { INIT } from './coreActions';
 import { actionIs } from './helpers.js';
 
 const WRONG_UPDATE_HANDLER = 'Dispatcher must be subclass of TanokDispatcher or iterable';
@@ -58,6 +59,7 @@ export const StreamWrapper = function(stream, streamName) {
     this.streamName = streamName;
     this.disposable = null;
     this.metadata = [];
+    this.shutdownActions = [];
     this.subs = {};
     this.subsWithMeta = new WeakMap();
 }
@@ -85,7 +87,7 @@ StreamWrapper.prototype.subStream = function(subName, subUpdate) {
         console.error.bind(console)
       );
 
-    subStreamWrapper.send('init');
+    subStreamWrapper.send(INIT);
 
     return subStreamWrapper;
 };
@@ -117,4 +119,12 @@ StreamWrapper.prototype.subWithMeta = function(sub, metadata) {
 
   storage.set(key, mock);
   return mock;
+}
+
+
+StreamWrapper.prototype.onShutdown = function() {
+  Object.values(this.subs).forEach((subStream) => {
+    subStream.onShutdown();
+  });
+  this.shutdownActions.forEach((shutdownAction) => shutdownAction());
 }

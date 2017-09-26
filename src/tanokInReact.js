@@ -1,6 +1,7 @@
 import Rx from 'rx';
 import React from 'react';
 
+import { INIT } from './coreActions';
 import { StreamWrapper } from './streamWrapper.js';
 import { makeStreamState, streamWithEffects, identity } from './core.js';
 
@@ -47,6 +48,7 @@ export class TanokInReact extends React.Component {
     }
 
     this.shutdown = () => {
+      streamWrapper.onShutdown();
       streamWrapper.disposable.dispose();
       outerEventDisposable && outerEventDisposable.dispose();
     };
@@ -58,7 +60,7 @@ export class TanokInReact extends React.Component {
       state: initialState,
     };
 
-    streamWrapper.send('init');
+    streamWrapper.send(INIT);
   }
 
   componentDidMount() {
