@@ -8,7 +8,8 @@
     "pretest": "npm run build",
     "build": "node rollup.js",
     "prebuild": "rm -rf lib/*",
-    "test": "mocha --compilers js:babel-register"
+    "test": "mocha --compilers js:babel-register",
+    "coverage": "nyc --reporter=html --reporter=text mocha --compilers js:babel-register"
   },
   "repository": {
     "type": "git",
@@ -51,6 +52,7 @@
     "babel-types": "^6.25.0",
     "invariant": "^2.2.2",
     "mocha": "^2.5.3",
+    "nyc": "^11.2.1",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
@@ -62,6 +64,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.9.2",
+    "expect": "^21.2.1",
     "webpack": "^1.15.0"
   },
   "false": {}
