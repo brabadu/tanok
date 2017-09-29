@@ -109,8 +109,9 @@ export function tanok(initialState, update, view, options) {
     container
   )
 
+  let outerEventDisposable;
   if (outerEventStream) {
-    const outerEventDisposable = outerEventStream.subscribe(
+    outerEventDisposable = outerEventStream.subscribe(
       streamWrapper.stream.onNext.bind(streamWrapper.stream),
       console.error.bind(console)
     )

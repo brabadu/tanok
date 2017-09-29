@@ -3,3 +3,6 @@ lib/
 .DS_Store
 .idea
 examples/main.bundle.js
+coverage/*
+.nyc_output/
+dom/

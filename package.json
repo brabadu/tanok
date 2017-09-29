@@ -8,7 +8,8 @@
     "pretest": "npm run build",
     "build": "node rollup.js",
     "prebuild": "rm -rf lib/*",
-    "test": "mocha --compilers js:babel-register"
+    "test": "mocha --compilers js:babel-register --require ./test/helpers.js  --require ./test/dom.js",
+    "coverage": "nyc --reporter=html --reporter=text mocha --compilers js:babel-register --require ./test/helpers.js --require ./test/dom.js"
   },
   "repository": {
     "type": "git",
@@ -49,16 +50,23 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
     "babel-types": "^6.25.0",
+    "enzyme": "^3.0.0",
+    "enzyme-adapter-react-15": "^1.0.0",
+    "expect": "^21.2.1",
     "invariant": "^2.2.2",
+    "jsdom": "^11.2.0",
     "mocha": "^2.5.3",
+    "nyc": "^11.2.1",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
+    "react-test-renderer": "^15.5.4",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^2.0.0",
-    "rx": "^4.0.6"
+    "rx": "^4.0.6",
+    "sinon": "^4.0.0"
   },
   "dependencies": {
     "babel-runtime": "^6.9.2",
