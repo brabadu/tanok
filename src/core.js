@@ -109,6 +109,7 @@ export function tanok(initialState, update, view, options) {
     ),
     container
   )
+
   let outerEventDisposable;
   if (outerEventStream) {
     outerEventDisposable = outerEventStream.subscribe(
