@@ -18,6 +18,13 @@ export class Dashboard extends TanokDispatcher {
   init(payload, state) {
     return [state,
       subcomponentFx(COUNTERS_CHANGE, (new CounterDispatcher).collect()),
+      (stream) => {
+        const interval = setInterval(() => console.log('Demo of shutdown'), 1000);
+        stream.shutdownActions.push(() => {
+          console.log('Shutdown action');
+          clearInterval(interval)
+        });
+      }
     ]
   }
 
