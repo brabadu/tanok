@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.0
+* Added shutdown behavior to `streamWrapper` that allows graceful shutdown of app #26
+
 ## 1.2.3
 * Fixed corrupting initial state type in TanokInReact
 
