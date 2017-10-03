@@ -123,8 +123,8 @@ StreamWrapper.prototype.subWithMeta = function(sub, metadata) {
 
 
 StreamWrapper.prototype.onShutdown = function() {
-  Object.values(this.subs).forEach((subStream) => {
-    subStream.onShutdown();
+  Object.keys(this.subs).forEach((subStreamKey) => {
+    this.subs[subStreamKey].onShutdown();
   });
   this.shutdownActions.forEach((shutdownAction) => shutdownAction());
 }
