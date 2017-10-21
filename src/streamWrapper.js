@@ -93,12 +93,16 @@ StreamWrapper.prototype.subStream = function(subName, subUpdate) {
 };
 
 StreamWrapper.prototype.send = function(action, payload) {
-  this.stream.onNext({
+  this.stream.onNext(this.getStreamPayload(action, payload));
+}
+
+StreamWrapper.prototype.getStreamPayload = function(action, payload) {
+  return {
     action,
     payload,
     streamName: this.streamName,
     metadataArray: this.metadata,
-  });
+  };
 }
 
 StreamWrapper.prototype.subWithMeta = function(sub, metadata) {
