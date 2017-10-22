@@ -154,9 +154,10 @@ export class CounterDispatcher extends TanokDispatcher {
 
 Great people of Evo Company:
 
+* [Anton Verinov](http://github.com/zemlanin)
 * [Boryslav Larin](http://github.com/brabadu)
 * [Dmitriy Sadkovoy](http://github.com/sadkovoy)
+* [Dmitry Zhuribeda](https://github.com/DZhuribeda)
 * [Valeriy Morkovyn](http://github.com/Lex0ne)
-* [Anton Verinov](http://github.com/zemlanin)
 
 With thoughtful tests and wise advices from many others.
