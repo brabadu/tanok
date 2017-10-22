@@ -25,7 +25,7 @@ import {
   TwoColumns,
 } from './4_subcomponent_collection/two_columns.js';
 
-import { loggingMiddleware } from './7_middlewares/middlewares'
+import { loggingMiddleware, tracingMiddleware } from './7_middlewares/middlewares'
 
 // basic usage
 tanok(init_1(), (new CounterDispatcher1), Counter1, {
@@ -36,6 +36,7 @@ tanok(init_1(), (new CounterDispatcher1), Counter1, {
 // Using effects (asynchronous events)
 tanok(init_2(), (new CounterDispatcher2), Counter2, {
   container: document.getElementById('effects'),
+  middlewares: [tracingMiddleware()],
 });
 
 // Simple subcomponents

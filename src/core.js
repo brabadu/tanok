@@ -21,10 +21,13 @@ class Root extends React.Component {
   }
 }
 
-export function makeStreamState(initialState, update, eventStream, middlewares) {
-  let dispatcher = dispatch(eventStream, update, null);
+export function makeStreamState(
+  initialState, update, eventStream, middlewares, streamWrapper,
+) {
+  const middlewaresWithStream =  middlewares.map(middleware => middleware(streamWrapper));
+  const composedMiddlewares = compose.apply(undefined, middlewaresWithStream);
 
-  const composedMiddlewares = compose.apply(undefined, middlewares);
+  let dispatcher = dispatch(eventStream, update, null);
 
   return dispatcher
     .scan((({state}, action) => {
@@ -81,7 +84,9 @@ export function tanok(initialState, update, view, options) {
   const streamWrapper = new StreamWrapper(eventStream, null);
   streamWrapper.metadata.push(null);
 
-  const streamState = makeStreamState(initialState, update, eventStream, middlewares);
+  const streamState = makeStreamState(
+    initialState, update, eventStream, middlewares, streamWrapper,
+  );
 
   let component;
   const renderedStream = streamState.do(
