@@ -8,8 +8,8 @@
     "pretest": "npm run build",
     "build": "node rollup.js",
     "prebuild": "rm -rf lib/*",
-    "test": "mocha --compilers js:babel-register --require ./test/helpers.js  --require ./test/dom.js",
-    "coverage": "nyc --reporter=html --reporter=text mocha --compilers js:babel-register --require ./test/helpers.js --require ./test/dom.js"
+    "test": "nyc --reporter=html --reporter=text mocha --compilers js:babel-register --require ./test/helpers.js --require ./test/dom.js",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -50,11 +50,13 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
     "babel-types": "^6.25.0",
+    "coveralls": "^3.0.0",
     "enzyme": "^3.0.0",
     "enzyme-adapter-react-15": "^1.0.0",
     "expect": "^21.2.1",
     "invariant": "^2.2.2",
     "jsdom": "^11.2.0",
+    "just-extend": "^1.1.22",
     "mocha": "^2.5.3",
     "nyc": "^11.2.1",
     "react": "^15.5.4",

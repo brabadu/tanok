@@ -1,4 +1,7 @@
 # tanok 💃
+
+[![Coverage Status](https://coveralls.io/repos/brabadu/tanok/badge.svg?branch=master)](https://coveralls.io/r/brabadu/tanok?branch=master)
+
 State management for React using Rx.js and Elm Architecture inspiration.
 
 You could start with [Elm Architecture Tutorial](https://github.com/evancz/elm-architecture-tutorial/), there's more info

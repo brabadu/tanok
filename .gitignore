@@ -6,3 +6,4 @@ examples/main.bundle.js
 coverage/*
 .nyc_output/
 dom/
+.coveralls.yml
