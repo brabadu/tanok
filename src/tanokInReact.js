@@ -23,7 +23,7 @@ export class TanokInReact extends React.Component {
     const streamState = makeStreamState(
       initialState,
       update,
-      eventStream,
+      streamWrapper,
       middlewares
     );
 
