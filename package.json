@@ -7,6 +7,10 @@
     "prepublish": "npm run test",
     "pretest": "npm run build",
     "build": "node rollup.js",
+    "docs:clean": "rm -rf _book/*",
+    "docs:prepare": "gitbook install",
+    "docs:build": "npm run docs:prepare && gitbook build",
+    "docs:watch": "gitbook serve",
     "prebuild": "rm -rf lib/*",
     "test": "nyc --reporter=html --reporter=text mocha --compilers js:babel-register --require ./test/helpers.js --require ./test/dom.js",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
@@ -54,6 +58,7 @@
     "enzyme": "^3.0.0",
     "enzyme-adapter-react-15": "^1.0.0",
     "expect": "^21.2.1",
+    "gitbook-cli": "^2.3.2",
     "invariant": "^2.2.2",
     "jsdom": "^11.2.0",
     "just-extend": "^1.1.22",
