@@ -1,9 +1,9 @@
 import Rx from 'rx';
-import { on, TanokDispatcher, rethrowFx } from  '../../lib/tanok.js';
+import { on, TanokDispatcher, rethrowFx } from  'tanok';
 import * as action from './actions';
 
 function searchRepos(searchTerm) {
-    return (stream) => {
+    return (stream) =>
         Rx.Observable.fromPromise(
           fetch(`https://api.github.com/search/repositories?q=${searchTerm || 'tanok'}`)
         )
@@ -12,7 +12,6 @@ function searchRepos(searchTerm) {
         .takeUntil(stream.stream.filter(({action: dispatchedAction}) => dispatchedAction === action.CANCEL_SEARCH))
         .do(() => console.log('post', searchTerm))
         .do(({ items }) => stream.send(action.SEARCH_OK, { items }))
-    }
 }
 
 function cancelSearch(stream) {
