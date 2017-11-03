@@ -1,0 +1,83 @@
+{
+  "name": "tanok",
+  "version": "1.3.0",
+  "description": "Lightweight pattern for React+Rx.js front-end applications. Written under heavy impression of Elm Architecture",
+  "main": "lib/tanok.js",
+  "scripts": {
+    "prepublish": "npm run test",
+    "pretest": "npm run build",
+    "build": "node rollup.js",
+    "docs:clean": "rm -rf _book/*",
+    "docs:prepare": "gitbook install",
+    "docs:build": "npm run docs:prepare && gitbook build",
+    "docs:watch": "gitbook serve",
+    "docs:publish": "npm run docs:clean && npm run docs:build && cp CNAME _book && cd _book && git init && git commit --allow-empty -m 'update book' && git checkout -b gh-pages && git add . && git commit -am 'update book' && git push git@github.com:brabadu/tanok gh-pages --force",
+    "prebuild": "rm -rf lib/*",
+    "test": "nyc --reporter=html --reporter=text mocha --compilers js:babel-register --require ./test/helpers.js --require ./test/dom.js",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brabadu/tanok.git"
+  },
+  "keywords": [
+    "rxjs",
+    "reactjs",
+    "flux",
+    "spa",
+    "elmlang"
+  ],
+  "author": {
+    "name": "Boryslav Larin"
+  },
+  "contributors": [
+    "Dmitry Sadkovoy",
+    "Valeriy Morkovyn",
+    "Anton Verinov <anton@verinov.com>",
+    "Dmitry Zhuribeda"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "prop-types": "*",
+    "react": "*",
+    "react-dom": "*",
+    "rx": "^4.0.6"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^6.4.1",
+    "babel-messages": "^6.23.0",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-plugin-transform-runtime": "^6.9.0",
+    "babel-preset-es2015-rollup": "^1.2.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.5.0",
+    "babel-register": "^6.9.0",
+    "babel-types": "^6.25.0",
+    "coveralls": "^3.0.0",
+    "enzyme": "^3.0.0",
+    "enzyme-adapter-react-15": "^1.0.0",
+    "expect": "^21.2.1",
+    "gitbook-cli": "^2.3.2",
+    "invariant": "^2.2.2",
+    "jsdom": "^11.2.0",
+    "just-extend": "^1.1.22",
+    "mocha": "^2.5.3",
+    "nyc": "^11.2.1",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-test-renderer": "^15.5.4",
+    "rollup": "^0.41.6",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "rx": "^4.0.6",
+    "sinon": "^4.0.0"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.9.2",
+    "webpack": "^1.15.0"
+  },
+  "false": {}
+}

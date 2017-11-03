@@ -1,0 +1,363 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Basic · Tanok</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="AsyncStuff.html" />
+    
+    
+    <link rel="prev" href="../" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="header">Getting Started</li>
+        
+        
+    
+        <li class="chapter active" data-level="2.1" data-path="Basics.html">
+            
+                <a href="Basics.html">
+            
+                    
+                    Basic
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.2" data-path="AsyncStuff.html">
+            
+                <a href="AsyncStuff.html">
+            
+                    
+                    Async Stuff
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="header">API Reference</li>
+        
+        
+    
+        <li class="chapter " data-level="3.1" data-path="Tanok.html">
+            
+                <a href="Tanok.html">
+            
+                    
+                    Tanok
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Basic</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="get-started">Get Started</h1>
+<h2 id="create-small-model">Create small model</h2>
+<p>To start with something small and simple we&apos;ll make a counter (see file <code>examples/1_basic/counter.js</code>). First we need a place to store our data.</p>
+<pre><code class="lang-js"><span class="hljs-keyword">const</span> Model = {
+  count: <span class="hljs-number">0</span>,
+};
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> Model;
+</code></pre>
+<h2 id="how-we-update-state">How we update state</h2>
+<p>Next we need rules to update our model</p>
+<pre><code class="lang-js"><span class="hljs-keyword">import</span> { TanokDispatcher, on } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;tanok&apos;</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CounterDispatcher</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">TanokDispatcher</span> </span>{
+
+    @on(<span class="hljs-string">&apos;inc&apos;</span>)
+    increment(payload, state) {
+        state.count += payload;
+        <span class="hljs-keyword">return</span> [state];
+    }
+
+    @on(<span class="hljs-string">&apos;dec&apos;</span>)
+    decrement(payload, state) {
+        state.count -= payload;
+        <span class="hljs-keyword">return</span> [state];
+    }
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> CounterDispatcher;
+</code></pre>
+<h2 id="visualise-our-state">Visualise our state</h2>
+<p>Last crucial thing for UI is it&apos;s visual representation</p>
+<pre><code class="lang-js"><span class="hljs-keyword">import</span> { tanokComponent } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;tanok&apos;</span>;
+
+@tanokComponent
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Counter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+    <span class="hljs-keyword">constructor</span>(props) {
+        <span class="hljs-keyword">super</span>(props);
+        <span class="hljs-keyword">this</span>.onPlusClick = <span class="hljs-keyword">this</span>.onPlusClick.bind(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.onMinusClick = <span class="hljs-keyword">this</span>.onMinusClick.bind(<span class="hljs-keyword">this</span>);
+    }
+
+    onPlusClick() {
+        <span class="hljs-keyword">this</span>.send(<span class="hljs-string">&apos;inc&apos;</span>, <span class="hljs-number">1</span>);
+    }
+
+    onMinusClick() {
+        <span class="hljs-keyword">this</span>.send(<span class="hljs-string">&apos;dec&apos;</span>, <span class="hljs-number">1</span>);
+    }
+
+    render() {
+        <span class="hljs-keyword">return</span> (
+            <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{this.onPlusClick}</span>&gt;</span>+<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>
+                    {this.props.count}
+                <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{this.onMinusClick}</span>&gt;</span>-<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+        );
+    }
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> Counter;
+</code></pre>
+<h2 id="get-all-together">Get all together</h2>
+<p>Now on to dancing</p>
+<pre><code class="lang-js"><span class="hljs-keyword">import</span> { tanok} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;tanok&apos;</span>;
+<span class="hljs-keyword">import</span> Counter <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;./view&apos;</span>;
+<span class="hljs-keyword">import</span> CounterDispatcher <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;./dispatcher&apos;</span>;
+<span class="hljs-keyword">import</span> Model <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;./model&apos;</span>;
+
+
+<span class="hljs-keyword">const</span> root = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&apos;root&apos;</span>);
+
+tanok(Model, <span class="hljs-keyword">new</span> CounterDispatcher(), Counter, {
+  container: root
+});
+</code></pre>
+<h2 id="next-steps">Next Steps</h2>
+<p>Looks pretty good, yeah? But in real world, we always should use async stuff (requests, websockets etc).
+Go forward to <a href="AsyncStuff.html">async stuff</a> section.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="../" class="navigation navigation-prev " aria-label="Previous page: Introduction">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="AsyncStuff.html" class="navigation navigation-next " aria-label="Next page: Async Stuff">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Basic","level":"2.1","depth":1,"next":{"title":"Async Stuff","level":"2.2","depth":1,"path":"docs/AsyncStuff.md","ref":"docs/AsyncStuff.md","articles":[]},"previous":{"title":"Introduction","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"plugins":[],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Tanok","gitbook":"^3.2.3"},"file":{"path":"docs/Basics.md","mtime":"2017-11-03T09:34:14.832Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2017-11-03T09:50:15.529Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
