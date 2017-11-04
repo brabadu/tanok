@@ -51,6 +51,69 @@ export function streamWithEffects(stream, streamWrapper) {
       )
 }
 
+function createStore(initialState, update, middlewares) {
+  let state = initialState;
+  const setState = (newState) => {
+    state = newState;
+  };
+  const getState = () => {
+    return state;
+  };
+
+  let currentListeners = [];
+  let nextListeners = currentListeners;
+
+  function ensureCanMutateNextListeners() {
+    if (nextListeners === currentListeners) {
+      nextListeners = currentListeners.slice();
+    }
+  }
+
+  function subscribe(listener) {
+    let isSubscribed = true;
+
+    ensureCanMutateNextListeners();
+    nextListeners.push(listener);
+
+    return function unsubscribe() {
+      if (!isSubscribed) {
+        return
+      }
+
+      isSubscribed = false;
+
+      ensureCanMutateNextListeners();
+      const index = nextListeners.indexOf(listener);
+      nextListeners.splice(index, 1);
+    }
+  }
+
+  function broadcast() {
+    const listeners = currentListeners = nextListeners;
+    for (let i = 0; i < listeners.length; i++) {
+      const listener = listeners[i];
+      listener();
+    }
+  }
+
+  const eventStream = new Rx.Subject();
+  const tanokStream = new StreamWrapper(eventStream, null);
+  tanokStream.metadata.push(null);
+
+  const streamState = makeStreamState(
+    initialState, update, tanokStream, middlewares,
+  )
+  .do(({ state }) => setState(state))
+  .do(() => broadcast());
+
+  return {
+    getState,
+    subscribe,
+    tanokStream,
+    streamState,
+  }
+}
+
 /**
  * @typedef TanokReturnValue
  * @type { Object }
@@ -80,34 +143,28 @@ export function tanok(initialState, update, view, options) {
     document.body.appendChild(container);
   }
 
-  const eventStream = new Rx.Subject();
-  const streamWrapper = new StreamWrapper(eventStream, null);
-  streamWrapper.metadata.push(null);
-
-  const streamState = makeStreamState(
-    initialState, update, streamWrapper, middlewares,
-  );
+  const {streamState, ...store} = createStore(initialState, update, middlewares);
 
   let component;
   const renderedStream = streamState.do(
     ({state}) => component && component.setState(stateSerializer(state))
   );
-  const renderedWithEffects = streamWithEffects(renderedStream, streamWrapper);
+  const renderedWithEffects = streamWithEffects(renderedStream, store.tanokStream);
 
-  streamWrapper.disposable = renderedWithEffects.subscribe(
+  store.tanokStream.disposable = renderedWithEffects.subscribe(
     Rx.helpers.noop,
     console.error.bind(console)
   );
 
-  streamWrapper.send(INIT);
+  store.tanokStream.send(INIT);
 
   component = ReactDOM.render(
     React.createElement(
       Root,
       Object.assign({
           view,
-          tanokStream: streamWrapper,
-          eventStream: streamWrapper,
+          tanokStream: store.tanokStream,
+          eventStream: store.tanokStream,
         },
         stateSerializer(initialState)
       )
@@ -118,21 +175,21 @@ export function tanok(initialState, update, view, options) {
   let outerEventDisposable;
   if (outerEventStream) {
     outerEventDisposable = outerEventStream.subscribe(
-      streamWrapper.stream.onNext.bind(streamWrapper.stream),
+      store.tanokStream.stream.onNext.bind(store.tanokStream.stream),
       console.error.bind(console)
     )
   }
 
   return {
-    disposable: streamWrapper.disposable,
-    streamWrapper,
+    disposable: store.tanokStream.disposable,
+    streamWrapper: store.tanokStream,
     shutdown: () => {
-      streamWrapper.onShutdown();
-      streamWrapper.disposable.dispose();
+      store.tanokStream.onShutdown();
+      store.tanokStream.disposable.dispose();
       outerEventDisposable && outerEventDisposable.dispose();
       ReactDOM.unmountComponentAtNode(container);
     },
-    eventStream,
+    eventStream: store.tanokStream.stream,
     component,
   };
 }
