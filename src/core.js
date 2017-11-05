@@ -3,23 +3,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import compose from './compose';
 import { INIT } from './coreActions';
+import Root from './root';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
 
 export const identity = (value) => value;
 
-class Root extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = props;
-  }
-
-  render() {
-    return React.createElement(
-      this.props.view,
-      this.state
-    )
-  }
-}
 
 export function makeStreamState(
   initialState, update, streamWrapper, middlewares,
@@ -54,7 +42,7 @@ export function streamWithEffects(stream, streamWrapper) {
 function createStore(initialState, update, middlewares) {
   let state = initialState;
   const setState = (newState) => {
-    state = newState;
+    state = { ...newState };
   };
   const getState = () => {
     return state;
@@ -137,59 +125,52 @@ function createStore(initialState, update, middlewares) {
  * and your app inner eventStream.
  * */
 export function tanok(initialState, update, view, options) {
-  let { container, outerEventStream, stateSerializer = identity, middlewares=[] } = options || {};
+  let { container, outerEventStream, middlewares=[] } = options || {};
   if (!container) {
     container = document.createElement('div');
     document.body.appendChild(container);
   }
+  const tmpStore = createStore(initialState, update, middlewares);
+  const {streamState, tanokStream} = tmpStore;
+  const store = {
+    getState: tmpStore.getState,
+    subscribe: tmpStore.subscribe,
+  }
 
-  const {streamState, ...store} = createStore(initialState, update, middlewares);
+  const renderedWithEffects = streamWithEffects(streamState, tanokStream);
 
-  let component;
-  const renderedStream = streamState.do(
-    ({state}) => component && component.setState(stateSerializer(state))
-  );
-  const renderedWithEffects = streamWithEffects(renderedStream, store.tanokStream);
-
-  store.tanokStream.disposable = renderedWithEffects.subscribe(
+  tanokStream.disposable = renderedWithEffects.subscribe(
     Rx.helpers.noop,
     console.error.bind(console)
   );
 
-  store.tanokStream.send(INIT);
-
-  component = ReactDOM.render(
-    React.createElement(
-      Root,
-      Object.assign({
-          view,
-          tanokStream: store.tanokStream,
-          eventStream: store.tanokStream,
-        },
-        stateSerializer(initialState)
-      )
-    ),
+  tanokStream.send(INIT);
+  const createdView = React.createElement(view);
+  const component = ReactDOM.render(
+    <Root store={store} tanokStream={tanokStream}>
+      {createdView}
+    </Root>,
     container
-  )
+  );
 
   let outerEventDisposable;
   if (outerEventStream) {
     outerEventDisposable = outerEventStream.subscribe(
-      store.tanokStream.stream.onNext.bind(store.tanokStream.stream),
+      tanokStream.stream.onNext.bind(tanokStream.stream),
       console.error.bind(console)
     )
   }
 
   return {
-    disposable: store.tanokStream.disposable,
-    streamWrapper: store.tanokStream,
+    disposable: tanokStream.disposable,
+    streamWrapper: tanokStream,
     shutdown: () => {
-      store.tanokStream.onShutdown();
-      store.tanokStream.disposable.dispose();
+      tanokStream.onShutdown();
+      tanokStream.disposable.dispose();
       outerEventDisposable && outerEventDisposable.dispose();
       ReactDOM.unmountComponentAtNode(container);
     },
-    eventStream: store.tanokStream.stream,
+    eventStream: tanokStream.stream,
     component,
   };
 }

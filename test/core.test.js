@@ -3,39 +3,77 @@
 import Rx from 'rx';
 import React from 'react';
 import expect from 'expect';
-import { mount } from 'enzyme';
 
-import { tanok, TanokDispatcher, on } from '../src/tanok.js';
-import { StreamWrapper } from '../src/streamWrapper.js';
-import sinon from 'sinon';
-
+import { tanok, TanokDispatcher, on, connect } from '../src/tanok.js';
 
 describe('core', () => {
+  function initModel() {
+    return {
+      count: 0,
+    }
+  };
 
-  class TestDispatcher extends TanokDispatcher {
+
+  class CounterDispatcher extends TanokDispatcher {
     @on('init')
-    init(_, state) {
+    init(payload, state) {
+      state.count = 10;
+      return [state];
+    }
+
+    @on('inc')
+    inc(payload, state) {
+      state.count += 1;
+      return [state];
+    }
+
+    @on('dec')
+    dec(payload, state) {
+      state.count -= 1;
       return [state];
     }
   }
 
-  class TestComponent extends React.Component {
+  const mapStateToProps = (state) => ({
+    count: state.count,
+  })
+
+  @connect(mapStateToProps)
+  class Counter extends React.Component {
+    constructor(props) {
+      super(props);
+      this.onPlusClick = this.onPlusClick.bind(this);
+      this.onMinusClick = this.onMinusClick.bind(this);
+    }
+
+    onPlusClick() {
+      this.props.send('inc')
+    }
+
+    onMinusClick() {
+      this.props.send('dec')
+    }
+
     render() {
-     return (
-         <div>{this.props.number}</div>
-     );
+      return (
+        <div>
+          <button onClick={this.onMinusClick}>-</button>
+          <span id="counter">{this.props.count}</span>
+          <button id="inc" onClick={this.onPlusClick}>+</button>
+        </div>
+      );
     }
   }
 
   it('launch and stop app', function (done) {
-    // I want as more coverage as possible muahahaha
-    const update = new TestDispatcher;
-    const eventStream = new Rx.Subject();
+    const update = new CounterDispatcher;
     const outerEventStream = new Rx.Subject();
-    const initState = 1;
-    const { shutdown } = tanok(initState, update, TestComponent, {
+    const { shutdown } = tanok(initModel(), update, Counter, {
       outerEventStream,
     });
+    expect(document.querySelector('#counter').innerHTML).toEqual("10");
+    document.querySelector('#inc').click();
+    expect(document.querySelector('#counter').innerHTML).toEqual("11");
     shutdown();
     done();
   });
