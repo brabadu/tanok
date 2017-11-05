@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import compose from './compose';
 import { INIT } from './coreActions';
-import Root from './root';
+import Root from './components/root';
 import { StreamWrapper, dispatch } from './streamWrapper.js';
 
 export const identity = (value) => value;
@@ -39,7 +39,8 @@ export function streamWithEffects(stream, streamWrapper) {
       )
 }
 
-function createStore(initialState, update, middlewares) {
+function createStore(initialState, update, options) {
+  let { outerEventStream, middlewares=[] } = options || {};
   let state = initialState;
   const setState = (newState) => {
     state = { ...newState };
@@ -94,64 +95,13 @@ function createStore(initialState, update, middlewares) {
   .do(({ state }) => setState(state))
   .do(() => broadcast());
 
-  return {
-    getState,
-    subscribe,
-    tanokStream,
-    streamState,
-  }
-}
-
-/**
- * @typedef TanokReturnValue
- * @type { Object }
- * @property { Object } disposable - Returns disposable that can be used for observers disposing.
- * @property { Object } eventStream - Your app inner eventStream.
- * */
-
-/**
- * App-initialization function.
- * @param { Object } initialState - Initial state of your application.
- * @param { Array } update - Array of pairs "predicate - state mutator",
- * declarative statement of your events dispatching. Usually - result of dispatcher.collect() invocation.
- * @param { class } view - Your root component class.
- * @param { Object } options - Advanced app configuration
- * @param { HTMLElement } options.container - Root node of your application.
- * If not provided - new "div" will be added and appended to document.body .
- * @param { Object } options.outerEventStream - Yet another stream that will be merged to your app inner stream.
- * @param { Function } options.stateSerializer - Advanced function to serialize your model before passing to view as props.
- * @param { Array } options.middlewares - List of middlewares.
- * @returns { TanokReturnValue } - Returns disposable as result of your observers applying,
- * and your app inner eventStream.
- * */
-export function tanok(initialState, update, view, options) {
-  let { container, outerEventStream, middlewares=[] } = options || {};
-  if (!container) {
-    container = document.createElement('div');
-    document.body.appendChild(container);
-  }
-  const tmpStore = createStore(initialState, update, middlewares);
-  const {streamState, tanokStream} = tmpStore;
-  const store = {
-    getState: tmpStore.getState,
-    subscribe: tmpStore.subscribe,
-  }
-
   const renderedWithEffects = streamWithEffects(streamState, tanokStream);
 
   tanokStream.disposable = renderedWithEffects.subscribe(
     Rx.helpers.noop,
     console.error.bind(console)
   );
-
   tanokStream.send(INIT);
-  const createdView = React.createElement(view);
-  const component = ReactDOM.render(
-    <Root store={store} tanokStream={tanokStream}>
-      {createdView}
-    </Root>,
-    container
-  );
 
   let outerEventDisposable;
   if (outerEventStream) {
@@ -161,16 +111,42 @@ export function tanok(initialState, update, view, options) {
     )
   }
 
-  return {
-    disposable: tanokStream.disposable,
-    streamWrapper: tanokStream,
+
+  return [tanokStream, {
+    getState,
+    subscribe,
     shutdown: () => {
       tanokStream.onShutdown();
       tanokStream.disposable.dispose();
       outerEventDisposable && outerEventDisposable.dispose();
       ReactDOM.unmountComponentAtNode(container);
     },
-    eventStream: tanokStream.stream,
+  }];
+}
+
+
+export function tanok(initialState, update, view, options) {
+  let container = options.container;
+  if (!container) {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+  }
+  const [tanokStream, store] = createStore(initialState, update, options);
+
+  const createdView = React.createElement(view);
+  const component = ReactDOM.render(
+    <Root store={store} tanokStream={tanokStream}>
+      {createdView}
+    </Root>,
+    container
+  );
+
+  return {
     component,
+    tanokStream,
+    shutdown: () => {
+      store.shutdown();
+      ReactDOM.unmountComponentAtNode(container);
+    },
   };
 }
