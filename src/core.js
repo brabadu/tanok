@@ -39,7 +39,7 @@ export function streamWithEffects(stream, streamWrapper) {
       )
 }
 
-function createStore(initialState, update, options) {
+export function createStore(initialState, update, options) {
   let { outerEventStream, middlewares=[] } = options || {};
   let state = initialState;
   const setState = (newState) => {

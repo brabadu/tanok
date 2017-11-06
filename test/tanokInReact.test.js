@@ -5,9 +5,7 @@ import React from 'react';
 import expect from 'expect';
 import { mount } from 'enzyme';
 
-import { TanokInReact, TanokDispatcher, on } from '../src/tanok.js';
-import { StreamWrapper } from '../src/streamWrapper.js';
-import sinon from 'sinon';
+import { TanokInReact, TanokDispatcher, on, connect } from '../src/tanok.js';
 
 
 describe('tanokInReact', () => {
@@ -19,6 +17,8 @@ describe('tanokInReact', () => {
     }
   }
 
+
+  @connect((state) => ({ number: state.number}))
   class TestComponent extends React.Component {
     render() {
      return (
@@ -46,7 +46,7 @@ describe('tanokInReact', () => {
           middlewares={[testMiddleware]}
         />
     );
-    const comp = wrapper.find(TestComponent);
+    const comp = wrapper.find(TestComponent).children();
     expect(comp.props().number).toEqual(1);
     wrapper.unmount();
     done();
