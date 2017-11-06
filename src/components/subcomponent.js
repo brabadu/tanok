@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { streamKey } from '../constants';
-import { storeShape } from '../connect/utils/PropTypes';
 
 export class Subcomponent extends React.Component {
   constructor(props, context) {
@@ -31,8 +30,8 @@ export class Subcomponent extends React.Component {
 }
 
 Subcomponent.propTypes = {
-    name: storeShape.isRequired,
-    metadata: PropTypes.element.isRequired,
+    name: PropTypes.any.isRequired,
+    metadata: PropTypes.any.isRequired,
 };
 Subcomponent.childContextTypes = {
     [streamKey]: PropTypes.any.isRequired,

@@ -1,5 +1,6 @@
 import hoistStatics from 'hoist-non-react-statics';
 import { Component, createElement } from 'react';
+import PropTypes from 'prop-types';
 
 import defaultMapSendToPropsFactories from './mapSendToProps'
 import defaultMapStateToPropsFactories from './mapStateToProps'
@@ -58,7 +59,7 @@ export function connect(
 
   const contextTypes = {
     [storeKey]: storeShape,
-    [streamKey]: storeShape,
+    [streamKey]: PropTypes.any.isRequired,
     [subscriptionKey]: subscriptionShape,
   }
   const childContextTypes = {

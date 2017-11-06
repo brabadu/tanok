@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createStore } from './core';
+import { createStore } from './createStore';
 import Root from "./components/root";
 
 

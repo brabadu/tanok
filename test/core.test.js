@@ -3,6 +3,7 @@
 import Rx from 'rx';
 import React from 'react';
 import expect from 'expect';
+import sinon from 'sinon';
 
 import { tanok, TanokDispatcher, on, connect } from '../src/tanok.js';
 
@@ -17,20 +18,26 @@ describe('core', () => {
   class CounterDispatcher extends TanokDispatcher {
     @on('init')
     init(payload, state) {
-      state.count = 10;
-      return [state];
+      return [{
+        ...state,
+        count: 10,
+      }];
     }
 
     @on('inc')
     inc(payload, state) {
-      state.count += 1;
-      return [state];
+      return [{
+        ...state,
+        count: state.count + 1,
+      }];
     }
 
     @on('dec')
     dec(payload, state) {
-      state.count -= 1;
-      return [state];
+      return [{
+        ...state,
+        count: state.count - 1,
+      }];
     }
   }
 
@@ -68,12 +75,16 @@ describe('core', () => {
   it('launch and stop app', function (done) {
     const update = new CounterDispatcher;
     const outerEventStream = new Rx.Subject();
-    const { shutdown } = tanok(initModel(), update, Counter, {
+    const { shutdown, store } = tanok(initModel(), update, Counter, {
       outerEventStream,
     });
+
+    const spy = sinon.spy();
+    store.subscribe(spy);
     expect(document.querySelector('#counter').innerHTML).toEqual("10");
     document.querySelector('#inc').click();
     expect(document.querySelector('#counter').innerHTML).toEqual("11");
+    expect(spy.calledOnce).toBeTruthy();
     shutdown();
     done();
   });
