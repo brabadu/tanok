@@ -119,7 +119,6 @@ function createStore(initialState, update, options) {
       tanokStream.onShutdown();
       tanokStream.disposable.dispose();
       outerEventDisposable && outerEventDisposable.dispose();
-      ReactDOM.unmountComponentAtNode(container);
     },
   }];
 }
