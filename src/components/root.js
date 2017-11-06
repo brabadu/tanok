@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 
 import { storeKey, streamKey, subscriptionKey } from '../constants';
 import { storeShape, subscriptionShape } from '../connect/utils/PropTypes';
-import {StreamWrapper} from "../streamWrapper";
 
 export default class Root extends React.Component {
   constructor(props, context) {
-    super(props, context)
+    super(props, context);
     this[storeKey] = props.store;
     this[streamKey] = props.tanokStream;
   }

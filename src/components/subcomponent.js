@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { storeKey, streamKey, subscriptionKey } from '../constants';
-import { storeShape, subscriptionShape } from '../connect/utils/PropTypes';
+import { streamKey } from '../constants';
+import { storeShape } from '../connect/utils/PropTypes';
 
 export class Subcomponent extends React.Component {
   constructor(props, context) {

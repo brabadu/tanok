@@ -1,13 +1,7 @@
-// encapsulates the subscription logic for connecting a component to the redux store, as
-// well as nesting subscriptions of descendant components, so that we can ensure the
-// ancestor components re-render before descendants
-
 const CLEARED = null
 const nullListeners = { notify() {} }
 
 function createListenerCollection() {
-  // the current/next pattern is copied from redux's createStore code.
-  // TODO: refactor+expose that code to be reusable here?
   let current = []
   let next = []
 
