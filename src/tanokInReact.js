@@ -17,7 +17,9 @@ export class TanokInReact extends React.Component {
       middlewares,
       outerEventStream,
     });
-    this.storeSub = store.subscribe(onNewState);
+    if (onNewState) {
+      this.storeSub = store.subscribe(onNewState);
+    }
     this.view = view;
     this.tanokStream = tanokStream;
     this.store = store;
@@ -25,7 +27,7 @@ export class TanokInReact extends React.Component {
   }
 
   componentWillUnmount() {
-    this.storeSub();
+    this.storeSub && this.storeSub();
     this.store.shutdown();
   }
 
