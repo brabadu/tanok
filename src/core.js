@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Root from './components/root';
+import { Root } from './components/root';
 import { createStore } from './createStore';
 
 export function tanok(initialState, update, view, options) {

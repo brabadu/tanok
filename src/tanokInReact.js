@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { createStore } from './createStore';
-import Root from "./components/root";
+import { Root } from "./components/root";
 
 
 export class TanokInReact extends React.Component {

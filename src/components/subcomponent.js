@@ -15,7 +15,6 @@ export class Subcomponent extends React.Component {
     } else {
       this[streamKey] = stream && stream.subs[name];
     }
-
   }
 
   getChildContext() {
@@ -31,7 +30,7 @@ export class Subcomponent extends React.Component {
 
 Subcomponent.propTypes = {
     name: PropTypes.any.isRequired,
-    metadata: PropTypes.any.isRequired,
+    metadata: PropTypes.any,
 };
 Subcomponent.childContextTypes = {
     [streamKey]: PropTypes.any.isRequired,

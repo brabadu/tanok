@@ -13,7 +13,7 @@
     "docs:watch": "gitbook serve",
     "docs:publish": "npm run docs:clean && npm run docs:build && cp CNAME _book && cd _book && git init && git commit --allow-empty -m 'update book' && git checkout -b gh-pages && git add . && git commit -am 'update book' && git push git@github.com:brabadu/tanok gh-pages --force",
     "prebuild": "rm -rf lib/*",
-    "test": "nyc --reporter=html --reporter=text mocha --compilers js:babel-register --require ./test/helpers.js --require ./test/dom.js",
+    "test": "nyc --reporter=html --reporter=text mocha --recursive --compilers js:babel-register --require ./test/helpers.js --require ./test/dom.js",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {

@@ -59,7 +59,7 @@ export function connect(
 
   const contextTypes = {
     [storeKey]: storeShape,
-    [streamKey]: PropTypes.any.isRequired,
+    [streamKey]: PropTypes.any,
     [subscriptionKey]: subscriptionShape,
   }
   const childContextTypes = {
