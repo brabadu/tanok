@@ -1,21 +1,21 @@
 import Rx from 'rx';
-import { actionIs } from './helpers.js';
+import { actionIs, PredicateReturnType, PredicateInterface } from './helpers.js';
 
 const WRONG_UPDATE_HANDLER = 'Dispatcher must be subclass of TanokDispatcher or iterable';
 
-function isIterable (object) {
+function isIterable (object: any): boolean {
   return object != null && typeof object[Symbol.iterator] === 'function';
 }
 
-function isFunction(x) {
+function isFunction(x): x is () => any {
   return Object.prototype.toString.call(x) === '[object Function]';
 }
 
-function maybeWrapActionIs(condition) {
+function maybeWrapActionIs(condition: PredicateReturnType | string): PredicateReturnType {
   return isFunction(condition) ? condition : actionIs(condition);
 }
 
-function commonDispatch(stream, updateHandlers, filterName, mapperFn) {
+function commonDispatch(stream: Rx.Observable<PayloadInterface>, updateHandlers, filterName: string, mapperFn): Rx.Observable<PayloadInterface> {
   if (!isIterable(updateHandlers)) {
     throw new Error(WRONG_UPDATE_HANDLER)
   }
@@ -32,7 +32,7 @@ function commonDispatch(stream, updateHandlers, filterName, mapperFn) {
   return Rx.Observable.merge.apply(undefined, dispatcherArray);
 }
 
-export function dispatch(stream, updateHandlers, filterName) {
+export function dispatch(stream: Rx.Observable<PayloadInterface>, updateHandlers, filterName: string): Rx.Observable<PayloadInterface> {
   return commonDispatch(
     stream, updateHandlers, filterName,
     (actionHandler) => (params) => (state) => {
@@ -43,7 +43,7 @@ export function dispatch(stream, updateHandlers, filterName) {
   })
 }
 
-function dispatchSub(stream, updateHandlers, filterName) {
+function dispatchSub(stream: Rx.Observable<PayloadInterface>, updateHandlers, filterName: string): Rx.Observable<PayloadInterface> {
   return commonDispatch(
     stream, updateHandlers, filterName,
     (actionHandler) => (params) => {
@@ -52,17 +52,38 @@ function dispatchSub(stream, updateHandlers, filterName) {
   )
 }
 
+type Effect = (stream: StreamWrapper) => void | Promise<void>;
 
-export const StreamWrapper = function(stream, streamName) {
+export type StateMutatorInterface = <S>(payload: PayloadInterface, state: S, metadata: any) => [S, Array<Effect>];
+
+export interface PayloadInterface {
+  action: string;
+  payload?: null | object | StateMutatorInterface;
+  streamName: string;
+  metadata: null | object;
+  metadataArray: object[];
+  stack: object[];
+}
+
+
+export class StreamWrapper {
+  stream: Rx.ISubject<PayloadInterface>;
+  streamName: string;
+  disposable?: Rx.IDisposable;
+  metadata: object[];
+  subs: object;
+  subsWithMeta: WeakMap<object, StreamWrapper>;
+
+  constructor(stream, streamName) {
     this.stream = stream;
     this.streamName = streamName;
     this.disposable = null;
     this.metadata = [];
     this.subs = {};
-    this.subsWithMeta = new WeakMap();
-}
+    this.subsWithMeta = new WeakMap<object, StreamWrapper>();
+  }
 
-StreamWrapper.prototype.subStream = function(subName, subUpdate) {
+  subStream(subName, subUpdate) {
     const subStreamWrapper = new StreamWrapper(this.stream, subName);
     subStreamWrapper.metadata = Array.prototype.concat(this.metadata, null);
     this.subs[subName] = subStreamWrapper;
@@ -88,33 +109,36 @@ StreamWrapper.prototype.subStream = function(subName, subUpdate) {
     subStreamWrapper.send('init');
 
     return subStreamWrapper;
-};
+  };
 
-StreamWrapper.prototype.send = function(action, payload) {
-  this.stream.onNext({
-    action,
-    payload,
-    streamName: this.streamName,
-    metadataArray: this.metadata,
-  });
-}
+  send(action: string, payload?: object) {
+    this.stream.onNext({
+      action,
+      payload,
+      streamName: this.streamName,
+      metadata: null,
+      metadataArray: this.metadata,
+      stack: [],
+    });
+  };
 
-StreamWrapper.prototype.subWithMeta = function(sub, metadata) {
-  const subStream = this.subs[sub];
-  if (!subStream) {
-    return null;
+  subWithMeta(sub, metadata) {
+    const subStream = this.subs[sub];
+    if (!subStream) {
+      return null;
+    }
+  
+    const key = {sub, metadata};
+    const storage = this.subsWithMeta;
+    if (storage.has(key)) {
+      return storage.get(key)
+    }
+  
+    const mock = new StreamWrapper(subStream.stream, subStream.streamName);
+    mock.metadata = this.metadata.concat(metadata);
+    mock.subs = subStream.subs;
+  
+    storage.set(key, mock);
+    return mock;
   }
-
-  const key = {sub, metadata};
-  const storage = this.subsWithMeta;
-  if (storage.has(key)) {
-    return storage.get(key)
-  }
-
-  const mock = new StreamWrapper(subStream.stream, subStream.streamName);
-  mock.metadata = this.metadata.concat(metadata);
-  mock.subs = subStream.subs;
-
-  storage.set(key, mock);
-  return mock;
 }

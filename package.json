@@ -58,7 +58,8 @@
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^2.0.0",
-    "rx": "^4.0.6"
+    "rx": "^4.0.6",
+    "typescript": "^2.7.1"
   },
   "dependencies": {
     "babel-runtime": "^6.9.2",

@@ -1,16 +1,19 @@
-export function rethrowFx(action, payload) {
-  return function (stream) {
+import { StreamWrapper } from './streamWrapper';
+
+export function rethrowFx(action: string, payload?: object) {
+  return function (stream: StreamWrapper) {
     stream.send(action, payload)
   }
 }
 
-export function subcomponentFx(subName, dispatchSub) {
-  return function (stream) {
+export function subcomponentFx(subName: string, dispatchSub) {
+  return function (stream: StreamWrapper) {
     stream.subStream(subName, dispatchSub)
   }
 }
 
-export function childFx(effect, streamName, metadata = null) {
+export function childFx(effect, streamName, metadata = null ) {
+
   return (streamWrapper) => {
     let substream;
     if (metadata !== null) {

@@ -1,18 +1,26 @@
-export const TanokDispatcher = function() {};
+import { StreamWrapper, StateMutatorInterface } from './streamWrapper';
+import { PredicateReturnType, PredicateInterface } from './helpers'
 
-TanokDispatcher.prototype.collect = function () {
-  return Object.keys(this.events).map(
-    (handlerFuncName) => {
-        const pair = this.events[handlerFuncName];
-        return [pair[0], pair[1].bind(this)];
-    }
-  );
-}
+type PredicatesArrayInterface = Array<string | PredicateInterface>;
 
-TanokDispatcher.prototype[Symbol.iterator] = function(){
-  function makeIterator(array){
+export class TanokDispatcher {
+  events: [
+    string,
+    [PredicatesArrayInterface, StateMutatorInterface]
+  ];
+
+  collect() {
+    return Object.keys(this.events).map(
+      (handlerFuncName) => {
+          const [predicate, handler] = this.events[handlerFuncName];
+          return [predicate, handler.bind(this)];
+      }
+    );
+  }
+
+  [Symbol.iterator]() {
+    function makeIterator(array){
       var nextIndex = 0;
-
       return {
          next: function(){
              return nextIndex < array.length ?
@@ -20,9 +28,9 @@ TanokDispatcher.prototype[Symbol.iterator] = function(){
                  {done: true};
          }
       };
+    }
+    return makeIterator(this.collect());
   }
-
-  return makeIterator(this.collect());
 }
 
 /**
@@ -42,7 +50,7 @@ TanokDispatcher.prototype[Symbol.iterator] = function(){
  * @param predicate - action title or multiple values like @on('actionTitle', debounce(500))
  * @returns {Function}
  */
-export function on(...predicate) {
+export function on(...predicate: PredicatesArrayInterface): ({events: object}, string) => void {
   return (target, property) => {
     target.events = target.events || {};
     const handlerFunc = target[property];
