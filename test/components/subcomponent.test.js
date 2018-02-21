@@ -24,7 +24,8 @@ describe('subcomponent', () => {
     }
 
     Child.contextTypes = {
-      [streamKey]: PropTypes.any.isRequired
+      [streamKey]: PropTypes.any.isRequired,
+      [storeKey]: PropTypes.any.isRequired,
     }
 
     return Child
@@ -44,20 +45,27 @@ describe('subcomponent', () => {
     const subName = 'subComponent';
     tanokStream.subStream(subName, new TestDispatcher)
     expect(tanokStream.subs).toHaveProperty(subName);
+    const subStateValue = 1;
 
     const tree = TestUtils.renderIntoDocument(
       <Root tanokStream={tanokStream} store={{
         subscribe: () => {},
-        getState: () => {},
+        getState: () => ({
+          subState: subStateValue
+        }),
       }}>
-        <Subcomponent name={subName}>
+        <Subcomponent
+          name={subName}
+          selector={(state) => state.subState}
+        >
           <Child />
         </Subcomponent>
       </Root>
     )
 
-    const child = TestUtils.findRenderedComponentWithType(tree, Child)
-    expect(child.context[streamKey].streamName).toBe(subName)
+    const child = TestUtils.findRenderedComponentWithType(tree, Child);
+    expect(child.context[streamKey].streamName).toBe(subName);
+    expect(child.context[storeKey].getState()).toBe(subStateValue);
 
     done();
   });
