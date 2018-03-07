@@ -6,7 +6,12 @@ import { StreamWrapper, dispatch } from './streamWrapper.js';
 
 export const identity = (value) => value;
 
-class Root extends React.Component {
+interface RootPropType {
+  view: React.Element;
+}
+
+class Root extends React.Component<RootPropType, {}> {
+  state : object;
   constructor(props) {
     super(props);
     this.state = props;

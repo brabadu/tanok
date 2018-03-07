@@ -74,7 +74,7 @@ export class StreamWrapper {
   subs: object;
   subsWithMeta: WeakMap<object, StreamWrapper>;
 
-  constructor(stream, streamName) {
+  constructor(stream: Rx.ISubject<PayloadInterface>, streamName: string) {
     this.stream = stream;
     this.streamName = streamName;
     this.disposable = null;
@@ -83,7 +83,7 @@ export class StreamWrapper {
     this.subsWithMeta = new WeakMap<object, StreamWrapper>();
   }
 
-  subStream(subName, subUpdate) {
+  subStream(subName: string, subUpdate) {
     const subStreamWrapper = new StreamWrapper(this.stream, subName);
     subStreamWrapper.metadata = Array.prototype.concat(this.metadata, null);
     this.subs[subName] = subStreamWrapper;
@@ -122,7 +122,7 @@ export class StreamWrapper {
     });
   };
 
-  subWithMeta(sub, metadata) {
+  subWithMeta(sub: string, metadata) {
     const subStream = this.subs[sub];
     if (!subStream) {
       return null;
