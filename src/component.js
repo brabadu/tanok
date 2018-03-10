@@ -49,10 +49,7 @@ export function tanokComponent(target) {
 
     const stream = this.props.tanokStream || this.props.eventStream;
 
-    if (metadata !== null) {
-      return stream && stream.subWithMeta(name, metadata);
-    }
-    return stream && stream.subs[name];
+    return stream && stream.subWithMeta(`${stream.streamName}.${name}`, metadata);
   };
 
   return target;

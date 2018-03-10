@@ -6,24 +6,15 @@ export function rethrowFx(action, payload) {
 
 export function subcomponentFx(subName, dispatchSub) {
   return function (stream) {
-    stream.subStream(subName, dispatchSub)
+      stream.subStream(`${stream.streamName}.${subName}`, dispatchSub);
   }
 }
 
 export function childFx(effect, streamName, metadata = null) {
   return (streamWrapper) => {
-    let substream;
-    if (metadata !== null) {
-      substream = streamWrapper.subWithMeta(streamName, metadata);
-    } else {
-      substream = streamWrapper.subs[streamName];
-    }
-    if (!substream) {
-      throw new Error(`No such substream '${streamName}'`)
-    }
-
-    return effect
-      ? effect(substream)
-      : Rx.helpers.noop;
+      const substream = streamWrapper.subWithMeta(`${streamWrapper.streamName}.${streamName}`, metadata);
+      return effect
+          ? effect(substream)
+          : Rx.helpers.noop;
   };
 }

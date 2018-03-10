@@ -18,11 +18,7 @@ export class Subcomponent extends React.Component {
       },
     };
 
-    if (metadata !== null) {
-      this[streamKey] = stream && stream.subWithMeta(name, metadata);
-    } else {
-      this[streamKey] = stream && stream.subs[name];
-    }
+    this[streamKey] = stream && stream.subWithMeta(`${stream.streamName}.${name}`, metadata);
   }
 
   getChildContext() {
