@@ -43,8 +43,8 @@ describe('subcomponent', () => {
     const eventStream = new Rx.Subject();
     const tanokStream = new StreamWrapper(eventStream, null);
     const subName = 'subComponent';
-    tanokStream.subStream(subName, new TestDispatcher)
-    expect(tanokStream.subs).toHaveProperty(subName);
+    tanokStream.subStream(`${tanokStream.streamName}.${subName}`, new TestDispatcher)
+    expect(tanokStream.subs).toHaveProperty([`${tanokStream.streamName}.${subName}`]);
     const subStateValue = 1;
 
     const tree = TestUtils.renderIntoDocument(
@@ -64,7 +64,7 @@ describe('subcomponent', () => {
     )
 
     const child = TestUtils.findRenderedComponentWithType(tree, Child);
-    expect(child.context[streamKey].streamName).toBe(subName);
+    expect(child.context[streamKey].streamName).toBe(`${tanokStream.streamName}.${subName}`);
     expect(child.context[storeKey].getState()).toBe(subStateValue);
 
     done();

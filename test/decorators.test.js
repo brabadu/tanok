@@ -8,11 +8,17 @@ import {tanokComponent} from '../src/tanok.js';
 
 class MockStreamWrapper {
   constructor(mockName) {
+    this.streamName = null;
     this.mockName = mockName;
-    this.subs = { mockName };
+    this.subs = {
+      [this.streamName + '.mockName']: mockName,
+    };
   }
   send(action, payload, metadata) {
     throw new Error(`${this.mockName}: action ${action}`);
+  }
+  subWithMeta(sub, metadata) {
+    return this.subs[`${sub}`];
   }
 
 }
@@ -58,21 +64,21 @@ describe('tanokDecorators', () => {
         tanokStream,
         eventStream,
       }
-      // c.send('foo')
+
       assert.throws(() => c.send('foo'), /tanok: action foo/)
-      assert(c.sub('mockName') == 'tanok')
+      assert(c.sub('mockName') === 'tanok')
 
       c.props = {
         tanokStream,
       }
       assert.throws(() => c.send('foo'), /tanok: action foo/)
-      assert(c.sub('mockName') == 'tanok')
+      assert(c.sub('mockName') === 'tanok')
 
       c.props = {
         eventStream,
       }
       assert.throws(() => c.send('foo'), /event: action foo/)
-      assert(c.sub('mockName') == 'event')
+      assert(c.sub('mockName') === 'event')
 
       done();
     });
