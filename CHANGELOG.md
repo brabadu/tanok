@@ -3,6 +3,8 @@
 ## 2.0.0
 * *BREAKING* Changed signatures for middlwares, so now they may receive `streamWrapper` #28
 * *BREAKING* Changed signature for `makeStreamState`, passing only `streamWrapper` instead of `eventStream` #30
+* *BREAKING* Removed `TanokComponent` prop `eventStream` as alternative name to `tanokStream` #37
+* *BREAKING* Removed `TanokComponent.subStream` as alternative name to `tanokStream` #37
 * Introducing `connect`, stores and all this redux madness #34
 * Moved docs to http://tanok.js.org/ #31 #32
 * Added check for test coverage #29
