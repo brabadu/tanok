@@ -53,6 +53,13 @@ function dispatchSub(stream, updateHandlers, filterName) {
   )
 }
 
+function getSubNamePath(parentStreamNamePath, streamName) {
+  return `${parentStreamNamePath}.${streamName}`;
+}
+
+function createSubStreamWrapper(parentStream, streamNamePath) {
+  return new StreamWrapper(parentStream.stream, streamNamePath);
+}
 
 export const StreamWrapper = function(stream, streamName) {
     this.stream = stream;
@@ -65,16 +72,17 @@ export const StreamWrapper = function(stream, streamName) {
 }
 
 StreamWrapper.prototype.subStream = function(subName, subUpdate) {
-    const subStreamWrapper = new StreamWrapper(this.stream, subName);
+    const subNamePath = getSubNamePath(this.streamName, subName);
+    const subStreamWrapper = createSubStreamWrapper(this, subNamePath);
     subStreamWrapper.metadata = Array.prototype.concat(this.metadata, null);
-    this.subs[subName] = subStreamWrapper;
+    this.subs[subNamePath] = subStreamWrapper;
 
-    subStreamWrapper.disposable = dispatchSub(this.stream, subUpdate, subName)
+    subStreamWrapper.disposable = dispatchSub(this.stream, subUpdate, subNamePath)
       .do((parentPayload) => {
         const stateMutator = parentPayload[0];
         const params = parentPayload[1];
         return this.stream.onNext({
-          action: subName,
+          action: subNamePath,
           payload: stateMutator,
           streamName: this.streamName,
           metadata: params.metadataArray[params.metadataArray.length - 1],
@@ -105,19 +113,21 @@ StreamWrapper.prototype.getStreamPayload = function(action, payload) {
   };
 }
 
-StreamWrapper.prototype.subWithMeta = function(sub, metadata) {
-  const subStream = this.subs[sub];
+StreamWrapper.prototype.subWithMeta = function(subName, metadata) {
+  const subNamePath = getSubNamePath(this.streamName, subName);
+
+  const subStream = this.subs[subNamePath];
   if (!subStream) {
     return null;
   }
 
-  const key = {sub, metadata};
+  const key = {subNamePath, metadata};
   const storage = this.subsWithMeta;
   if (storage.has(key)) {
     return storage.get(key)
   }
 
-  const mock = new StreamWrapper(subStream.stream, subStream.streamName);
+  const mock = createSubStreamWrapper(subStream, subStream.streamName);
   mock.metadata = this.metadata.concat(metadata);
   mock.subs = subStream.subs;
 

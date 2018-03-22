@@ -43,7 +43,7 @@ describe('subcomponent', () => {
     const eventStream = new Rx.Subject();
     const tanokStream = new StreamWrapper(eventStream, null);
     const subName = 'subComponent';
-    tanokStream.subStream(`${tanokStream.streamName}.${subName}`, new TestDispatcher)
+    tanokStream.subStream(subName, new TestDispatcher);
     expect(tanokStream.subs).toHaveProperty([`${tanokStream.streamName}.${subName}`]);
     const subStateValue = 1;
 

@@ -6,13 +6,13 @@ export function rethrowFx(action, payload) {
 
 export function subcomponentFx(subName, dispatchSub) {
   return function (stream) {
-      stream.subStream(`${stream.streamName}.${subName}`, dispatchSub);
+      stream.subStream(subName, dispatchSub);
   }
 }
 
 export function childFx(effect, streamName, metadata = null) {
   return (streamWrapper) => {
-      const substream = streamWrapper.subWithMeta(`${streamWrapper.streamName}.${streamName}`, metadata);
+      const substream = streamWrapper.subWithMeta(streamName, metadata);
       return effect
           ? effect(substream)
           : Rx.helpers.noop;
