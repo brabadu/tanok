@@ -82,7 +82,7 @@ StreamWrapper.prototype.subStream = function(subName, subUpdate) {
         const stateMutator = parentPayload[0];
         const params = parentPayload[1];
         return this.stream.onNext({
-          action: subNamePath,
+          action: subName,
           payload: stateMutator,
           streamName: this.streamName,
           metadata: params.metadataArray[params.metadataArray.length - 1],
