@@ -1,6 +1,6 @@
 export function actionIs(actionName) {
   return function () {
-      return this.filter(({ action, streamName }) => action === `${streamName}.${actionName}`);
+      return this.filter(({ action, streamName }) => action === actionName);
   };
 }
 

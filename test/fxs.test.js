@@ -23,7 +23,7 @@ describe('fxs', () => {
     const eventStream = new Rx.Subject();
     const streamWrapper = new StreamWrapper(eventStream, null);
     subcomponentFx('subComponent', new TestDispatcher)(streamWrapper);
-    expect(streamWrapper.subs).toHaveProperty('subComponent');
+    expect(streamWrapper.subs).toHaveProperty(['null.subComponent']);
     done();
   });
 

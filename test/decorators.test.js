@@ -8,11 +8,17 @@ import {tanokComponent} from '../src/tanok.js';
 
 class MockStreamWrapper {
   constructor(mockName) {
+    this.streamName = null;
     this.mockName = mockName;
-    this.subs = { mockName };
+    this.subs = {
+      [this.streamName + '.mockName']: mockName,
+    };
   }
   send(action, payload, metadata) {
     throw new Error(`${this.mockName}: action ${action}`);
+  }
+  subWithMeta(sub, metadata) {
+    return this.subs[`${sub}`];
   }
 
 }
@@ -29,13 +35,6 @@ describe('tanokDecorators', () => {
       done();
     });
 
-    it('provides "subStream" method', function (done) {
-      assert(TestComponent.prototype.hasOwnProperty('subStream'),
-          'must have method "subStream" for child component connection'
-      );
-      done();
-    });
-
     it('provides "sub" method', function (done) {
       assert(TestComponent.prototype.hasOwnProperty('sub'),
           'must have method "sub" for child component connection'
@@ -43,37 +42,22 @@ describe('tanokDecorators', () => {
       done();
     });
 
-    it('handles both tanokStream and eventStream params', function (done) {
+    it('handles tanokStream params', function (done) {
+      const tanokStream = new MockStreamWrapper('tanok');
+
       @tanokComponent
       class MockReactComponent {
         constructor() {
-          this.props = {};
+          this.props = {
+            tanokStream        
+          };
         }
       }
 
-      const tanokStream = new MockStreamWrapper('tanok');
-      const eventStream = new MockStreamWrapper('event');
       const c = new MockReactComponent();
-      c.props = {
-        tanokStream,
-        eventStream,
-      }
-      // c.send('foo')
+
       assert.throws(() => c.send('foo'), /tanok: action foo/)
-      assert(c.sub('mockName') == 'tanok')
-
-      c.props = {
-        tanokStream,
-      }
-      assert.throws(() => c.send('foo'), /tanok: action foo/)
-      assert(c.sub('mockName') == 'tanok')
-
-      c.props = {
-        eventStream,
-      }
-      assert.throws(() => c.send('foo'), /event: action foo/)
-      assert(c.sub('mockName') == 'event')
-
+      assert(c.sub('mockName') === 'tanok')
       done();
     });
 
