@@ -43,9 +43,8 @@ describe('core', () => {
 
   const mapStateToProps = (state) => ({
     count: state.count,
-  })
+  });
 
-  @connect(mapStateToProps)
   class Counter extends React.Component {
     constructor(props) {
       super(props);
@@ -54,11 +53,11 @@ describe('core', () => {
     }
 
     onPlusClick() {
-      this.props.send('inc')
+      this.props.tanokStream.send('inc')
     }
 
     onMinusClick() {
-      this.props.send('dec')
+      this.props.tanokStream.send('dec')
     }
 
     render() {
@@ -72,10 +71,12 @@ describe('core', () => {
     }
   }
 
-  it('launch and stop app', function (done) {
+  const ConnectedCounter = connect(mapStateToProps)(Counter);
+
+  it('launch and stop app connected', function (done) {
     const update = new CounterDispatcher;
     const outerEventStream = new Rx.Subject();
-    const { shutdown, store } = tanok(initModel(), update, Counter, {
+    const { shutdown, store } = tanok(initModel(), update, ConnectedCounter, {
       outerEventStream,
     });
 
@@ -85,6 +86,19 @@ describe('core', () => {
     document.querySelector('#inc').click();
     expect(document.querySelector('#counter').innerHTML).toEqual("11");
     expect(spy.calledOnce).toBeTruthy();
+    shutdown();
+    done();
+  });
+  it('launch and stop app unconnected', function (done) {
+    const update = new CounterDispatcher;
+    const outerEventStream = new Rx.Subject();
+    const { shutdown, store } = tanok(initModel(), update, Counter, {
+      outerEventStream,
+    });
+
+    expect(document.querySelector('#counter').innerHTML).toEqual("10");
+    document.querySelector('#inc').click();
+    expect(document.querySelector('#counter').innerHTML).toEqual("11");
     shutdown();
     done();
   });
