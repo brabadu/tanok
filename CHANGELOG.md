@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3
+* Reexport `StreamWrapper` from entry point (mostly for creating mocks for propType checker in tests)
+
+## 2.0.2
+* Made `tanok` v2 tanok compatible with v1 model and dispatcher
+
 ## 2.0.0
 * *BREAKING* Changed signatures for middlwares, so now they may receive `streamWrapper` #28
 * *BREAKING* Changed signature for `makeStreamState`, passing only `streamWrapper` instead of `eventStream` #30
