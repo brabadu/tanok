@@ -12,21 +12,31 @@ export function tanok(initialState, update, view, options) {
   }
   const [tanokStream, store] = createStore(initialState, update, options);
 
-  const createdView = React.createElement(view);
-  const component = ReactDOM.render(
-    <Root store={store} tanokStream={tanokStream}>
-      {createdView}
-    </Root>,
-    container
-  );
+  let component;
+  const render = () => {
+    const createdView = React.createElement(
+      view, {
+        tanokStream,
+        ...store.getState(),
+      });
+    component = ReactDOM.render(
+      <Root store={store} tanokStream={tanokStream}>
+        {createdView}
+      </Root>,
+      container
+    );
+  };
+  render();
+  const sub = store.subscribe(render);
 
   return {
     component,
     tanokStream,
     store,
     shutdown: () => {
+      sub();
       store.shutdown();
-      ReactDOM.unmountComponentAtNode(container);
+      container && ReactDOM.unmountComponentAtNode(container);
     },
   };
 }
