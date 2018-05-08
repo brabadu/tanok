@@ -9,6 +9,7 @@ export * from './connect/connect';
 export * from './createStore';
 export * from './components/root';
 export * from './components/subcomponent';
+export { StreamWrapper } from './streamWrapper';
 
 import { childFx } from './fxs';
 
