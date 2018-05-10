@@ -5,7 +5,10 @@ import React from 'react';
 import expect from 'expect';
 import { mount } from 'enzyme';
 
-import { TanokInReact, TanokDispatcher, on, connect } from '../src/tanok.js';
+import {
+  TanokInReact, TanokDispatcher,
+  on, connect, tanokComponent
+} from '../src/tanok.js';
 
 
 describe('tanokInReact', () => {
@@ -27,7 +30,7 @@ describe('tanokInReact', () => {
     }
   }
 
-  it('tanokInReact renderred as want', function (done) {
+  it('with store renderred as want', function (done) {
     const update = new TestDispatcher;
     const eventStream = new Rx.Subject();
     const testMiddleware = (stream) => {
@@ -48,6 +51,31 @@ describe('tanokInReact', () => {
     );
     const comp = wrapper.find(TestComponent).children();
     expect(comp.props().number).toEqual(1);
+    wrapper.unmount();
+    done();
+  });
+
+  @tanokComponent
+  class TestComponent2 extends React.Component {
+    render() {
+      return (
+         <div>{this.props.number}</div>
+      );
+    }
+  }
+
+  it('without store renderred as want', function (done) {
+    const update = new TestDispatcher;
+    const eventStream = new Rx.Subject();
+    const wrapper = mount(
+        <TanokInReact
+          initialState={{ number: 3 }}
+          update={update}
+          view={TestComponent2}
+        />
+    );
+    const comp = wrapper.find(TestComponent2).children();
+    expect(comp.html()).toEqual('<div>3</div>');
     wrapper.unmount();
     done();
   });

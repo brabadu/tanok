@@ -23,7 +23,6 @@ export class TanokInReact extends React.Component {
     this.view = view;
     this.tanokStream = tanokStream;
     this.store = store;
-
   }
 
   componentWillUnmount() {
@@ -34,7 +33,7 @@ export class TanokInReact extends React.Component {
   render() {
     return (
       <Root store={this.store} tanokStream={this.tanokStream}>
-          <this.view />
+          <this.view tanokStream={this.tanokStream} {...this.store.getState()} />
       </Root>
     )
   }
