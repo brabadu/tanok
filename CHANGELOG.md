@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.4
+* Fixed compatability in v1/v2 `tanok` versions in `TanokInReact` component
+
 ## 2.0.3
 * Reexport `StreamWrapper` from entry point (mostly for creating mocks for propType checker in tests)
 
