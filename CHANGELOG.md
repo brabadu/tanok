@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.5
+* Fixed force updating of `TanokInReact` on state change
+
 ## 2.0.4
 * Fixed compatability in v1/v2 `tanok` versions in `TanokInReact` component
 
