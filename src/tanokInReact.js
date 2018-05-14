@@ -18,15 +18,20 @@ export class TanokInReact extends React.Component {
       outerEventStream,
     });
     if (onNewState) {
-      this.storeSub = store.subscribe(onNewState);
+      this.storeSubOnNewState = store.subscribe(onNewState);
     }
     this.view = view;
     this.tanokStream = tanokStream;
     this.store = store;
   }
 
+  componentDidMount() {
+    this.storeSubOnStoreUpd = this.store.subscribe(() => this.forceUpdate());
+  }
+
   componentWillUnmount() {
-    this.storeSub && this.storeSub();
+    this.storeSubOnNewState && this.storeSubOnNewState();
+    this.storeSubOnStoreUpd();
     this.store.shutdown();
   }
 

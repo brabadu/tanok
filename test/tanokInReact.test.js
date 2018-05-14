@@ -18,6 +18,12 @@ describe('tanokInReact', () => {
     init(_, state) {
       return [state];
     }
+
+    @on('inc')
+    inc(_, state) {
+      state.number += 1;
+      return [{...state}];
+    }
   }
 
 
@@ -76,6 +82,13 @@ describe('tanokInReact', () => {
     );
     const comp = wrapper.find(TestComponent2).children();
     expect(comp.html()).toEqual('<div>3</div>');
+
+    // dispatch event
+    wrapper.find(TestComponent2).prop('tanokStream').send('inc')
+    
+    const comp2 = wrapper.find(TestComponent2).children();
+    expect(comp2.html()).toEqual('<div>4</div>');
+
     wrapper.unmount();
     done();
   });
