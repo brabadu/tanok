@@ -80,14 +80,15 @@ describe('tanokInReact', () => {
           view={TestComponent2}
         />
     );
-    const comp = wrapper.find(TestComponent2).children();
-    expect(comp.html()).toEqual('<div>3</div>');
+    const comp = wrapper.find(TestComponent2);
+    expect(comp.prop('number')).toEqual(3);
 
     // dispatch event
     wrapper.find(TestComponent2).prop('tanokStream').send('inc')
+    wrapper.update();
     
-    const comp2 = wrapper.find(TestComponent2).children();
-    expect(comp2.html()).toEqual('<div>4</div>');
+    const comp2 = wrapper.find(TestComponent2);
+    expect(comp2.prop('number')).toEqual(4);
 
     wrapper.unmount();
     done();
