@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.6
+* Backported `stateSerializer` prop in `TanokInReact`
+
 ## 2.0.5
 * Fixed force updating of `TanokInReact` on state change
 

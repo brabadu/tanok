@@ -4,13 +4,17 @@ import { createStore } from './createStore';
 import { Root } from "./components/root";
 
 
+const identity = (x) => x;
+
 export class TanokInReact extends React.Component {
   constructor(props) {
     super(props);
     const {
-       initialState, update, view,
-       middlewares = [],
-       onNewState, outerEventStream
+      initialState, update, view,
+      middlewares = [],
+      onNewState,
+      outerEventStream,
+      stateSerializer,
     } = props;
 
     const [tanokStream, store] = createStore(initialState, update, {
@@ -23,6 +27,7 @@ export class TanokInReact extends React.Component {
     this.view = view;
     this.tanokStream = tanokStream;
     this.store = store;
+    this.stateSerializer = stateSerializer || identity;
   }
 
   componentDidMount() {
@@ -38,7 +43,9 @@ export class TanokInReact extends React.Component {
   render() {
     return (
       <Root store={this.store} tanokStream={this.tanokStream}>
-          <this.view tanokStream={this.tanokStream} {...this.store.getState()} />
+          <this.view
+            tanokStream={this.tanokStream}
+            {...this.stateSerializer(this.store.getState())} />
       </Root>
     )
   }
