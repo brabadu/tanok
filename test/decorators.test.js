@@ -1,9 +1,12 @@
 'use strict';
 
+import Rx from 'rx';
 import React from 'react';
 import assert from 'assert';
 
-import {tanokComponent} from '../src/tanok.js';
+import { tanokComponent, StreamWrapper } from '../src/tanok.js';
+import { Stream } from 'stream';
+
 
 
 class MockStreamWrapper {
@@ -44,7 +47,7 @@ describe('tanokDecorators', () => {
 
     it('handles tanokStream params', function (done) {
       const tanokStream = new MockStreamWrapper('tanok');
-
+  
       @tanokComponent
       class MockReactComponent {
         constructor() {
@@ -57,7 +60,30 @@ describe('tanokDecorators', () => {
       const c = new MockReactComponent();
 
       assert.throws(() => c.send('foo'), /tanok: action foo/)
-      assert(c.sub('mockName') === 'tanok')
+      done();
+    });
+
+    it('tanokCompoment.sub call returns StreamWrapper instance', function (done) {
+      // const tanokStream = new StreamWrapper('tanok');
+      const eventStream = new Rx.Subject();
+      const tanokStream = new StreamWrapper(eventStream, null);
+      tanokStream.metadata.push(null);
+
+      const subName = 'mockName';
+      tanokStream.subStream(subName, []);
+
+      @tanokComponent
+      class MockReactComponent {
+        constructor() {
+          this.props = {
+            tanokStream        
+          };
+        }
+      }
+
+      const c = new MockReactComponent();
+
+      assert(c.sub(subName) instanceof StreamWrapper)
       done();
     });
 

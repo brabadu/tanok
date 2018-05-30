@@ -32,7 +32,7 @@ export function tanokComponent(target) {
 
   target.prototype.sub = function sub(name, metadata = null) {
     const stream = this.props.tanokStream;
-    return stream && stream.subWithMeta(`${stream.streamName}.${name}`, metadata);
+    return stream && stream.subWithMeta(name, metadata);
   };
 
   return target;
