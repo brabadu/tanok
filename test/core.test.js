@@ -103,4 +103,53 @@ describe('core', () => {
     done();
   });
 
+  class TestComponentTwiceNumber extends React.Component {
+    constructor(props) {
+      super(props);
+      this.onPlusClick = this.onPlusClick.bind(this);
+      this.onMinusClick = this.onMinusClick.bind(this);
+    }
+
+    onPlusClick() {
+      this.props.tanokStream.send('inc')
+    }
+
+    onMinusClick() {
+      this.props.tanokStream.send('dec')
+    }
+
+    render() {
+      return (
+        <div>
+          <button onClick={this.onMinusClick}>-</button>
+          <button id="inc" onClick={this.onPlusClick}>+</button>
+          <span id="counter">{this.props.count}</span>
+          <span id="twiceCounter">{this.props.twiceCount}</span>
+        </div>
+      );
+    }
+  }
+  
+  it('stateSerializer works', function (done) {
+    function stateSerializer(state) {
+      return {
+        ...state,
+        twiceCount: state.count * 2,
+      }
+    }
+
+    const update = new CounterDispatcher;
+    const { shutdown } = tanok(initModel(), update, TestComponentTwiceNumber, {
+      stateSerializer,
+    });
+
+    console.log(document.body.innerHTML);
+    expect(document.querySelector('#counter').innerHTML).toEqual("10");
+    expect(document.querySelector('#twiceCounter').innerHTML).toEqual("20");
+    document.querySelector('#inc').click();
+    expect(document.querySelector('#counter').innerHTML).toEqual("11");
+    expect(document.querySelector('#twiceCounter').innerHTML).toEqual("22");
+    shutdown();
+    done();
+  });
 });

@@ -36,14 +36,18 @@ function streamWithEffects(stream, streamWrapper) {
 }
 
 export function createStore(initialState, update, options) {
-  let { outerEventStream, middlewares=[] } = options || {};
+  let {
+    outerEventStream,
+    stateSerializer,
+    middlewares=[],
+  } = options || {};
   let state = initialState;
   const setState = (newState) => {
     state = newState;
   };
-  const getState = () => {
-    return state;
-  };
+  const getState = stateSerializer
+    ? () => stateSerializer(state)
+    : () => state;
 
   let currentListeners = [];
   let nextListeners = currentListeners;
