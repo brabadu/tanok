@@ -1,3 +1,5 @@
+import Rx from '@evo/rx';
+
 export function rethrowFx(action, payload) {
   return function (stream) {
     stream.send(action, payload)
