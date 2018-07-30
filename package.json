@@ -1,6 +1,6 @@
 {
   "name": "tanok",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "Lightweight pattern for React+Rx.js front-end applications. Written under heavy impression of Elm Architecture",
   "main": "lib/tanok.js",
   "scripts": {
