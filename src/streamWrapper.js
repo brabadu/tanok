@@ -1,4 +1,4 @@
-import Rx from 'rx';
+import Rx from '@evo/rx';
 import { INIT } from './coreActions';
 import { actionIs } from './helpers.js';
 

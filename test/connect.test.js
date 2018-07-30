@@ -1,6 +1,6 @@
 /*eslint-disable react/prop-types*/
 
-import Rx from 'rx';
+import Rx from '@evo/rx';
 import expect from 'expect'
 import sinon from 'sinon';
 import React, { Children, Component } from 'react'
