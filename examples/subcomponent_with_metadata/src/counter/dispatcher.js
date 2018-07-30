@@ -1,5 +1,5 @@
 import { on, TanokDispatcher } from 'tanok';
-import Rx from 'rx';
+import Rx from '@evo/rx';
 
 function syncEffect(cnt) {
   return function (stream) {

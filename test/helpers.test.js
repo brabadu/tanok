@@ -1,6 +1,6 @@
 'use strict';
 
-import Rx from 'rx';
+import Rx from '@evo/rx';
 
 import { actionIs } from '../src/helpers';
 

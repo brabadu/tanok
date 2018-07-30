@@ -1,7 +1,7 @@
 
 'use strict';
 
-import Rx from 'rx';
+import Rx from '@evo/rx';
 import React from 'react';
 import expect from 'expect';
 import sinon from 'sinon';

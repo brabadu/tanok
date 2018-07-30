@@ -1,6 +1,6 @@
 'use strict';
 
-import Rx from 'rx';
+import Rx from '@evo/rx';
 import PropTypes from 'prop-types';
 import React from 'react';
 import expect from 'expect';
