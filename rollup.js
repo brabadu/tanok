@@ -26,29 +26,26 @@ const plugins = [
     "babelrc": false
   }),
   nodeResolve({
-    main: true,
-    skip: peerDependencies,
-    preferBuiltins: false,
-  }),
+    customResolveOptions: {
+      moduleDirectory: 'node_modules'
+  }}),
   commonjs(),
 ]
 
 entries.forEach((entry) => {
   rollup.rollup({
-    entry: entry.entry,
+    input: entry.entry,
     plugins: plugins,
-    external: ['rx', 'react', 'prop-types', 'react-dom'],
-    globals: {
-      rx: 'Rx',
-      react: 'React',
-      'react-dom': 'ReactDOM',
-    },
-  })
-  .then(
+    external: peerDependencies
+  }).then(
       (bundle) => bundle.write({
-        format: 'umd',
-        moduleName: entry.moduleName,
-        dest: entry.entry.replace('src', 'lib'),
+          file: entry.entry.replace('src', 'lib'),
+          format: 'umd',
+          globals: {
+            react: 'React',
+            'react-dom': 'ReactDOM',
+          },
+          name: entry.moduleName
       }),
       (error) => {
         console.error(error)
