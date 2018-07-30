@@ -1,4 +1,4 @@
-import Rx from 'rx';
+import Rx from '@evo/rx';
 import { on, TanokDispatcher, rethrowFx } from  'tanok';
 import * as action from './actions';
 

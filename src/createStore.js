@@ -1,4 +1,4 @@
-import Rx from 'rx';
+import Rx from '@evo/rx';
 import React from 'react';
 import compose from './compose';
 import { INIT } from './coreActions';
